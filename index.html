@@ -13,8 +13,8 @@
 <script type="module">
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 // ONLY publishable key; NEVER put sb_secret_ or service_role in this file.
-const SUPABASE_URL='https://YOUR-PROJECT.supabase.co';
-const SUPABASE_KEY='YOUR-PUBLISHABLE-KEY';
+const SUPABASE_URL='https://nysbumbjvhzjaokuiqst.supabase.co';
+const SUPABASE_KEY='sb_publishable_8d8Lta1jIrXyrJmh8uPoCQ_ilABjqU9';
 const db=createClient(SUPABASE_URL,SUPABASE_KEY);
 const el=id=>document.getElementById(id);
 const qs=new URLSearchParams(location.search);let room=qs.get('room'),token=qs.get('token');
