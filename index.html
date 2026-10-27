@@ -1,0 +1,454 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1">
+<title>Aumann Live</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    background: #f7f7f7;
+    color: #222;
+  }
+  h1 { font-size: 26px; }
+  .card {
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    margin: 15px 0;
+    box-shadow: 0 1px 5px #ddd;
+  }
+  .choices {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  button {
+    font-size: 18px;
+    padding: 14px 8px;
+    border-radius: 10px;
+    border: 1px solid #bbb;
+    background: white;
+    cursor: pointer;
+  }
+  button.primary {
+    background: #202020;
+    color: white;
+    border-color: #202020;
+  }
+  button:disabled {
+    opacity: .4;
+    cursor: default;
+  }
+  input {
+    padding: 10px;
+    font-size: 18px;
+    width: 90%;
+    margin-bottom: 12px;
+  }
+  .timer {
+    font-size: 44px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .big { font-size: 34px; font-weight: 700; }
+  .latest {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    text-align: center;
+  }
+  .latest div {
+    background: #eee;
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .history {
+    max-height: 220px;
+    overflow-y: auto;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.9;
+  }
+  .muted { color: #666; }
+  .hidden { display: none; }
+  .error { color: #a00; }
+  #guestLink {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<h1>🎲 Aumann Live</h1>
+
+<div id="setup" class="card">
+  <h3>Create a game</h3>
+  <p>Possible states</p>
+  <input id="statesInput" value="ABCD">
+  <p>Number of rounds</p>
+  <input id="roundsInput" type="number" value="5"
+         min="1" max="100">
+  <button id="createBtn" class="primary">Create Game</button>
+</div>
+
+<div id="game" class="hidden">
+
+  <div class="card">
+    <strong id="playerLabel"></strong>
+    <p id="roundLabel"></p>
+    <p class="muted">Your information set</p>
+    <div id="info" class="big">—</div>
+    <p class="muted">Time remaining</p>
+    <div id="timer" class="timer">15.0</div>
+    <p id="connection" class="muted"></p>
+  </div>
+
+  <div class="card">
+    <h3>Choose a state</h3>
+    <div id="choices" class="choices"></div>
+  </div>
+
+  <div class="card">
+    <div class="latest">
+      <div>
+        <div class="muted">Your choice</div>
+        <div id="myChoice" class="big">—</div>
+      </div>
+      <div>
+        <div class="muted">Opponent</div>
+        <div id="opponentChoice" class="big">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Click history</h3>
+    <div id="history" class="history"></div>
+  </div>
+
+  <div id="hostControls" class="card hidden">
+    <h3>Host controls</h3>
+    <button id="nextBtn" class="primary">
+      Start / Next Round
+    </button>
+    <button id="stopBtn">Stop</button>
+    <div id="invite" class="hidden">
+      <p>Share this link with Player 2:</p>
+      <input id="guestLink" readonly>
+      <button id="copyBtn">Copy Player 2 Link</button>
+    </div>
+  </div>
+
+</div>
+
+<p id="message" class="muted"></p>
+
+<script type="module">
+import { createClient } from
+  "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+// ========================================
+// CHANGE THESE TWO VALUES
+// ========================================
+const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
+const SUPABASE_KEY = "YOUR-PUBLISHABLE-KEY";
+
+// ========================================
+
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = id => document.getElementById(id);
+
+const params = new URLSearchParams(location.search);
+let room = params.get("room");
+let token = params.get("token");
+
+let game = null;
+let channel = null;
+let offsetMs = 0;
+let refreshing = false;
+let refreshAgain = false;
+let clickBusy = false;
+
+function message(text, isError = false) {
+  $("message").textContent = text;
+  $("message").className = isError ? "error" : "muted";
+}
+
+async function rpc(name, args) {
+  const { data, error } = await db.rpc(name, args);
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+function privateArgs() {
+  return { p_room: room, p_token: token };
+}
+
+async function createGame() {
+  try {
+    $("createBtn").disabled = true;
+
+    const states = [...$("statesInput").value
+      .trim().toUpperCase()];
+
+    const rounds = Number($("roundsInput").value);
+
+    const data = await rpc("live_create", {
+      p_states: states,
+      p_rounds: rounds
+    });
+
+    room = data.room;
+    token = data.host_token;
+
+    const base = location.origin + location.pathname;
+
+    const hostUrl = `${base}?room=${room}&token=${token}`;
+    const guestUrl =
+      `${base}?room=${room}&token=${data.guest_token}`;
+
+    sessionStorage.setItem(
+      `aumann_guest_${room}`, guestUrl
+    );
+
+    history.replaceState({}, "", hostUrl);
+
+    await enterGame();
+
+  } catch (e) {
+    message(e.message, true);
+    $("createBtn").disabled = false;
+  }
+}
+
+function remainingMs() {
+  if (!game || !game.started_ms ||
+      game.status !== "playing") return 0;
+
+  return Math.max(
+    0,
+    15000 - (Date.now() + offsetMs - game.started_ms)
+  );
+}
+
+function updateTimer() {
+  if (!game) return;
+
+  let remaining = remainingMs();
+
+  $("timer").textContent =
+    (remaining / 1000).toFixed(1) + " s";
+
+  if (game.status === "stopped") {
+    $("timer").textContent = "Stopped";
+  }
+
+  const active = remaining > 0 &&
+    game.status === "playing";
+
+  document.querySelectorAll(".choiceBtn").forEach(
+    button => button.disabled = !active
+  );
+
+  if (game.player === 1) {
+    $("nextBtn").disabled =
+      game.status === "stopped" ||
+      game.round >= game.max_rounds ||
+      active;
+  }
+}
+
+function render() {
+  $("playerLabel").textContent =
+    `Player ${game.player}`;
+
+  $("roundLabel").textContent =
+    `Round ${game.round} / ${game.max_rounds}`;
+
+  $("info").textContent =
+    game.info ? `{${game.info.join(", ")}}` : "—";
+
+  $("choices").replaceChildren();
+
+  game.states.forEach(state => {
+    const button = document.createElement("button");
+    button.textContent = state;
+    button.className = "choiceBtn";
+    button.addEventListener("click", () => choose(state));
+    $("choices").appendChild(button);
+  });
+
+  let mine = "—";
+  let theirs = "—";
+
+  $("history").replaceChildren();
+
+  game.clicks.forEach(c => {
+    if (c.player === game.player) mine = c.choice;
+    else theirs = c.choice;
+
+    const line = document.createElement("div");
+    line.textContent =
+      `${(c.elapsed_ms / 1000).toFixed(3)}s — ` +
+      `Player ${c.player}: ${c.choice}`;
+
+    $("history").appendChild(line);
+  });
+
+  $("myChoice").textContent = mine;
+  $("opponentChoice").textContent = theirs;
+
+  updateTimer();
+}
+
+async function refresh() {
+  if (refreshing) {
+    refreshAgain = true;
+    return;
+  }
+
+  refreshing = true;
+
+  try {
+    const before = Date.now();
+    const result = await rpc("live_view", privateArgs());
+    const after = Date.now();
+
+    // Approximate offset between local and server clocks
+    offsetMs = result.server_ms - (before + after) / 2;
+    game = result;
+
+    render();
+    message("");
+
+  } catch (e) {
+    message(e.message, true);
+  } finally {
+    refreshing = false;
+    if (refreshAgain) {
+      refreshAgain = false;
+      refresh();
+    }
+  }
+}
+
+async function choose(choice) {
+  if (clickBusy || remainingMs() <= 0) return;
+
+  clickBusy = true;
+
+  try {
+    await rpc("live_choose", {
+      ...privateArgs(),
+      p_choice: choice
+    });
+    await refresh();
+  } catch (e) {
+    message(e.message, true);
+  } finally {
+    clickBusy = false;
+  }
+}
+
+async function nextRound() {
+  try {
+    $("nextBtn").disabled = true;
+    await rpc("live_next", privateArgs());
+    await refresh();
+  } catch (e) {
+    message(e.message, true);
+    updateTimer();
+  }
+}
+
+async function stopGame() {
+  try {
+    await rpc("live_stop", privateArgs());
+    await refresh();
+  } catch (e) {
+    message(e.message, true);
+  }
+}
+
+async function enterGame() {
+  $("setup").classList.add("hidden");
+  $("game").classList.remove("hidden");
+
+  await refresh();
+
+  if (!game) return;
+
+  if (game.player === 1) {
+    $("hostControls").classList.remove("hidden");
+
+    const guestUrl = sessionStorage.getItem(
+      `aumann_guest_${room}`
+    );
+
+    if (guestUrl) {
+      $("invite").classList.remove("hidden");
+      $("guestLink").value = guestUrl;
+    }
+  }
+
+  // Realtime WebSocket channel
+  channel = db.channel(`aumann:${room}`);
+
+  channel.on(
+    "broadcast",
+    { event: "changed" },
+    () => refresh()
+  );
+
+  channel.subscribe(status => {
+    $("connection").textContent =
+      `Realtime: ${status}`;
+
+    if (status === "SUBSCRIBED") {
+      refresh();
+    }
+  });
+}
+
+// UI events
+$("createBtn").onclick = createGame;
+$("nextBtn").onclick = nextRound;
+$("stopBtn").onclick = stopGame;
+
+$("copyBtn").onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(
+      $("guestLink").value
+    );
+    message("Player 2 link copied.");
+  } catch {
+    message("Select and copy the link above.");
+  }
+};
+
+// Local timer refresh (does not query database)
+setInterval(updateTimer, 50);
+
+// Recover state when phone returns to the page
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && room && token) refresh();
+});
+
+// Occasional recovery if a Realtime event was missed
+setInterval(() => {
+  if (room && token && !document.hidden) refresh();
+}, 5000);
+
+// Start
+if (room && token) enterGame();
+</script>
+</body>
+</html>
