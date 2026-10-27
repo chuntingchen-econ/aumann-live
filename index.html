@@ -9,6 +9,12 @@
 <section class="card"><h2>即時點選紀錄</h2><div id="history" class="history"></div></section>
 <section class="card"><h2>本回合得分</h2><div id="scores" class="muted">回合結束後顯示。</div></section>
 <section id="host" class="card hide"><h2>Player 1 控制</h2><div id="invite" class="hide"><label>Player 2 專屬網址</label><input id="guesturl" readonly><button id="copy">複製 Player 2 連結</button></div><div class="controls" style="margin-top:12px"><button class="main" id="prepare">準備下一回合</button><button class="main" id="start">雙方 Ready，開始計時</button><button id="stop">停止實驗</button></div></section></div>
+<div id="homePanel" class="card hide">
+  <button id="homeBtn" class="main">
+    返回首頁／建立新遊戲
+  </button>
+</div>
+
 <p id="message" class="warn"></p>
 <script type="module">
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -58,6 +64,13 @@ async function showScore(){if(scoreLoading||!game)return;const key=room+':'+game
  }catch(e){/* server may be completing cutoff */}finally{scoreLoading=false}}
 function render(){
  if(!game)return;
+ el('homePanel').classList.toggle(
+  'hide',
+  game.status !== 'stopped' &&
+  !(game.round >= game.max_rounds &&
+    game.status === 'playing' &&
+    remaining() <= 0)
+);
  el('seat').textContent='Player '+game.player;
  el('roundlabel').textContent=`Round ${game.round} / ${game.max_rounds} · 每回合 ${game.seconds} 秒`;
  if(game.round===0){el('notice').textContent='尚未產生第一回合';el('qtitle').textContent='等待開始';el('rules').textContent='';}
@@ -91,6 +104,10 @@ el('ready').onclick=()=>action('live_ready_v2');
 el('prepare').onclick=()=>action('live_prepare_v2');
 el('start').onclick=()=>action('live_start_v2');
 el('stop').onclick=()=>action('live_stop');
+ el('homeBtn').onclick = () => {
+  window.location.href =
+    window.location.origin + window.location.pathname;
+};
 el('copy').onclick=async()=>{try{await navigator.clipboard.writeText(el('guesturl').value);msg('已複製 Player 2 連結')}catch{msg('請長按網址手動複製')}};
 setInterval(updateTimer,50);
 setInterval(()=>{if(room&&token&&!document.hidden)void refresh()},4000);
