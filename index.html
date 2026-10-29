@@ -3,7 +3,7 @@
 </style></head><body>
 <h1>🎲 Aumann Live</h1>
 <div id="joinbox" class="card"><h2>參加實驗</h2><label for="joincode">請輸入實驗者給你的代碼</label><input id="joincode" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="例如 4821"><div class="controls" style="margin-top:12px"><button id="joinBtn" class="main">加入</button></div></div>
-<div id="setup" class="card"><h2>實驗者：建立實驗</h2><label for="states">狀態集合 S</label><input id="states" value="ABCD" maxlength="6"><label for="rounds">總回合數</label><input id="rounds" type="number" value="4" min="1" max="100"><label for="seconds">每回合秒數</label><input id="seconds" type="number" value="15" min="1" max="300"><p class="muted">題目 Q1、Q2、Q3、Q4 依序循環。每回合重新抽取真實狀態和兩人的資訊。</p>
+<div id="setup" class="card hide"><h2>實驗者：建立實驗</h2><label for="states">狀態集合 S</label><input id="states" value="ABCD" maxlength="6"><label for="rounds">總回合數</label><input id="rounds" type="number" value="4" min="1" max="100"><label for="seconds">每回合秒數</label><input id="seconds" type="number" value="15" min="1" max="300"><p class="muted">題目 Q1、Q2、Q3、Q4 依序循環。每回合重新抽取真實狀態和兩人的資訊。</p>
 <label for="newcode">加入代碼（3–12 個英文或數字；留空會自動產生 4 位數）</label><input id="newcode" autocomplete="off" maxlength="12" placeholder="留空自動產生">
 <div class="controls" style="margin-top:12px"><button id="createSession" class="main">建立自動配對場次</button><button id="create">建立單一雙人遊戲（手動）</button></div>
 <p class="muted">自動配對：把加入代碼告訴所有參與者，輸入代碼的人依到達順序兩兩配對，配對後雙方按 Ready 就自動開始。</p></div>
@@ -21,8 +21,6 @@
 <section class="card"><b id="seat"></b><p id="roundlabel" class="muted"></p><p id="stateset"></p><h2>本回合資訊</h2><div id="notice" class="big">—</div><p id="connection" class="muted"></p></section>
 <section class="card"><h2 id="qtitle">題目</h2><p id="rules"></p><p class="muted">每秒結束時以當時有效選擇計分；未選擇時為 0 分。</p><div id="readystatus" class="muted"></div><button id="ready" class="main">我已閱讀，Ready</button></section>
 <section id="playpanel" class="card"><h2>選擇狀態</h2><div id="timer" class="timer">—</div><div id="choices" class="choices"></div><div class="pair" style="margin-top:16px"><div><span class="muted">你的最新選擇</span><div id="mine" class="big">—</div></div><div><span class="muted">對手最新選擇</span><div id="theirs" class="big">—</div></div></div></section>
-<section class="card"><h2>即時點選紀錄</h2><div id="history" class="history"></div></section>
-<section class="card"><h2>本回合得分</h2><div id="scores" class="muted">回合結束後顯示。</div></section>
 <section id="host" class="card hide"><h2>Player 1 控制</h2><div id="invite" class="hide"><label>Player 2 專屬網址</label><input id="guesturl" readonly><button id="copy">複製 Player 2 連結</button></div><div class="controls" style="margin-top:12px"><button class="main" id="prepare">準備下一回合</button><button class="main" id="start">雙方 Ready，開始計時</button><button class="danger" id="stop">停止實驗</button></div></section>
 </div></div>
 <p id="message" class="warn"></p>
@@ -136,7 +134,6 @@ function updateTimer(){if(!game)return;
  el('start').disabled=!host||game.status!=='ready'||!game.ready_me||!game.ready_opponent;
  el('start').classList.toggle('hide',game.status!=='ready');
  el('prepare').classList.toggle('hide',game.status==='ready');
- if(game.round>0&&game.round_started&&(game.status==='stopped'||(game.status==='playing'&&!active)))showScore();
 }
 let scoreKey='',scoreLoading=false,scoreRetryAt=0;
 async function showScore(){if(scoreLoading||!game)return;const key=room+':'+game.round+':'+game.status;if(scoreKey===key||Date.now()<scoreRetryAt)return;
@@ -168,14 +165,11 @@ function render(){
  const away=game.session&&game.opponent_seen_ago_ms!=null&&game.opponent_seen_ago_ms>15000&&game.status!=='stopped';
  el('connection').textContent=(away?'⚠ 對手可能已離線':'');
  buildChoices();
- let mine=null,theirs=null;const hist=el('history');hist.replaceChildren();
- (game.clicks||[]).forEach(c=>{if(c.player===game.player)mine=c.choice;else theirs=c.choice;
- const p=document.createElement('div');p.textContent=`${(c.elapsed_ms/1000).toFixed(3)}s · Player ${c.player}：${c.choice}`;hist.appendChild(p)});
+ let mine=game.my_choice??null,theirs=game.opponent_choice??null;
  if(localPick&&localPick.round!==game.round)localPick=null;
  const shownMine=(localPick&&inflight>0)?localPick.choice:(mine??localPick?.choice??null);
  el('mine').textContent=shownMine??'—';el('theirs').textContent=theirs??'—';
  document.querySelectorAll('.statebtn').forEach(b=>b.classList.toggle('picked',b.dataset.state===shownMine));
- if(!scoreKey.startsWith(room+':'+game.round+':'))el('scores').textContent='回合結束後顯示。';
  updateTimer();
 }
 async function refresh(){if(!room||!token)return;if(loading){pending=true;return;}loading=true;
@@ -220,4 +214,5 @@ if(room&&token)void enter();
 else if(sessionId&&adminToken)void monitor(sessionId,adminToken);
 else if(sessionId)void joinSession(sessionId);
 else if(codeParam)void joinByCode(codeParam);
+else if(qs.has('setup'))el('setup').classList.remove('hide');   // experimenter page: ?setup
 </script></body></html>
