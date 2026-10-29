@@ -1,17 +1,28 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aumann Live</title><style>
-:root{font-family:system-ui,-apple-system,sans-serif;color:#20222a;background:#f4f5f7}body{max-width:560px;margin:auto;padding:14px}h1{font-size:25px}h2{font-size:19px}.card{background:#fff;border-radius:14px;padding:17px;margin:12px 0;box-shadow:0 1px 5px #ddd}input{box-sizing:border-box;width:100%;padding:12px;font-size:17px;border:1px solid #c5c8d0;border-radius:8px}label{display:block;margin:10px 0 5px;font-weight:600}button{padding:13px;border:1px solid #bbb;border-radius:10px;font-size:16px;background:#fff;cursor:pointer}button.main{background:#223149;color:#fff;border-color:#223149}button.danger{border-color:#a23426;color:#a23426}button.danger.armed{background:#a23426;color:#fff}button:disabled{opacity:.35}button:active{transform:scale(.98)}.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(62px,1fr));gap:9px}.choices button{font-size:22px;font-weight:650;touch-action:manipulation}.choices button.picked{outline:3px solid #223149}.big{font-size:30px;font-weight:700}.timer{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums}.muted{color:#626b78}.hide{display:none}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pair>div{background:#f1f2f5;border-radius:10px;padding:14px;text-align:center}.history{max-height:185px;overflow-y:auto;line-height:1.8}.warn{color:#a23426}.controls{display:flex;gap:10px;flex-wrap:wrap}#message{white-space:pre-wrap}#endcard{border:2px solid #223149}
+:root{font-family:system-ui,-apple-system,sans-serif;color:#20222a;background:#f4f5f7}body{max-width:560px;margin:auto;padding:14px}h1{font-size:25px}h2{font-size:19px}.card{background:#fff;border-radius:14px;padding:17px;margin:12px 0;box-shadow:0 1px 5px #ddd}input{box-sizing:border-box;width:100%;padding:12px;font-size:17px;border:1px solid #c5c8d0;border-radius:8px}label{display:block;margin:10px 0 5px;font-weight:600}button{padding:13px;border:1px solid #bbb;border-radius:10px;font-size:16px;background:#fff;cursor:pointer}button.main{background:#223149;color:#fff;border-color:#223149}button.danger{border-color:#a23426;color:#a23426}button.danger.armed{background:#a23426;color:#fff}button:disabled{opacity:.35}button:active{transform:scale(.98)}.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(62px,1fr));gap:9px}.choices button{font-size:22px;font-weight:650;touch-action:manipulation}.choices button.picked{outline:3px solid #223149}.big{font-size:30px;font-weight:700}.timer{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums}.muted{color:#626b78}.hide{display:none}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pair>div{background:#f1f2f5;border-radius:10px;padding:14px;text-align:center}.history{max-height:185px;overflow-y:auto;line-height:1.8}.warn{color:#a23426}.controls{display:flex;gap:10px;flex-wrap:wrap}#message{white-space:pre-wrap}#endcard{border:2px solid #223149}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:6px 4px;border-bottom:1px solid #e3e5ea}th{color:#626b78;font-weight:600}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.stats>div{background:#f1f2f5;border-radius:10px;padding:10px;text-align:center}.stats b{display:block;font-size:24px}
 </style></head><body>
 <h1>🎲 Aumann Live</h1>
-<div id="setup" class="card"><h2>建立雙人遊戲</h2><label for="states">狀態集合 S</label><input id="states" value="ABCD" maxlength="6"><label for="rounds">總回合數</label><input id="rounds" type="number" value="3" min="1" max="100"><label for="seconds">每回合秒數</label><input id="seconds" type="number" value="15" min="1" max="300"><p class="muted">題目 Q1、Q2、Q3、Q4 依序循環。每回合重新抽取真實狀態和兩人的資訊。</p><button id="create" class="main">Create Game</button></div>
+<div id="setup" class="card"><h2>建立實驗</h2><label for="states">狀態集合 S</label><input id="states" value="ABCD" maxlength="6"><label for="rounds">總回合數</label><input id="rounds" type="number" value="4" min="1" max="100"><label for="seconds">每回合秒數</label><input id="seconds" type="number" value="15" min="1" max="300"><p class="muted">題目 Q1、Q2、Q3、Q4 依序循環。每回合重新抽取真實狀態和兩人的資訊。</p>
+<div class="controls"><button id="createSession" class="main">建立自動配對場次</button><button id="create">建立單一雙人遊戲（手動）</button></div>
+<p class="muted">自動配對：把參與者連結發給所有人，打開連結的人依到達順序兩兩配對，配對後雙方按 Ready 就自動開始。</p></div>
+<div id="monitor" class="hide">
+<section class="card"><h2>場次監看</h2><label>參與者連結（發給所有受試者）</label><input id="sessionurl" readonly><button id="copySession">複製參與者連結</button>
+<p id="sessioninfo" class="muted"></p><div class="stats"><div><b id="nWaiting">0</b>等待配對</div><div><b id="nPlaying">0</b>進行中</div><div><b id="nDone">0</b>已完成</div></div>
+<p class="muted">這個頁面的網址含管理權限，請勿分享。</p></section>
+<section class="card"><h2>各組狀態</h2><table><thead><tr><th>組別</th><th>狀態</th><th>回合</th><th>P1／P2 上次連線</th></tr></thead><tbody id="gamesTable"></tbody></table></section>
+<section class="card"><h2>控制</h2><div class="controls"><button id="closeSession">停止接受新的參與者</button><button class="danger" id="stopSession">停止所有組並關閉場次</button></div></section>
+</div>
 <div id="game" class="hide">
-<section id="endcard" class="card hide"><h2>實驗已結束</h2><p class="muted">所有紀錄都已保存在資料庫。</p><button id="home" class="main">返回首頁／建立新遊戲</button></section>
+<section id="waitcard" class="card hide"><h2>正在等待另一位參與者…</h2><p class="muted">請保持這個頁面開啟。配對成功後會自動進入第一回合。</p><p id="waitconn" class="muted"></p></section>
+<div id="gamebody">
+<section id="endcard" class="card hide"><h2>實驗已結束</h2><p id="endtext" class="muted">所有紀錄都已保存在資料庫。</p><button id="home" class="main">返回首頁／建立新遊戲</button></section>
 <section class="card"><b id="seat"></b><p id="roundlabel" class="muted"></p><h2>本回合資訊</h2><div id="notice" class="big">—</div><p id="connection" class="muted"></p></section>
 <section class="card"><h2 id="qtitle">題目</h2><p id="rules"></p><p class="muted">每秒結束時以當時有效選擇計分；未選擇時為 0 分。</p><div id="readystatus" class="muted"></div><button id="ready" class="main">我已閱讀，Ready</button></section>
 <section id="playpanel" class="card"><h2>選擇狀態</h2><div id="timer" class="timer">—</div><div id="choices" class="choices"></div><div class="pair" style="margin-top:16px"><div><span class="muted">你的最新選擇</span><div id="mine" class="big">—</div></div><div><span class="muted">對手最新選擇</span><div id="theirs" class="big">—</div></div></div></section>
 <section class="card"><h2>即時點選紀錄</h2><div id="history" class="history"></div></section>
 <section class="card"><h2>本回合得分</h2><div id="scores" class="muted">回合結束後顯示。</div></section>
 <section id="host" class="card hide"><h2>Player 1 控制</h2><div id="invite" class="hide"><label>Player 2 專屬網址</label><input id="guesturl" readonly><button id="copy">複製 Player 2 連結</button></div><div class="controls" style="margin-top:12px"><button class="main" id="prepare">準備下一回合</button><button class="main" id="start">雙方 Ready，開始計時</button><button class="danger" id="stop">停止實驗</button></div></section>
-</div>
+</div></div>
 <p id="message" class="warn"></p>
 <script type="module">
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
@@ -20,38 +31,93 @@ const SUPABASE_URL='https://nysbumbjvhzjaokuiqst.supabase.co';
 const SUPABASE_KEY='sb_publishable_8d8Lta1jIrXyrJmh8uPoCQ_ilABjqU9';
 const db=createClient(SUPABASE_URL,SUPABASE_KEY);
 const el=id=>document.getElementById(id);
+const BASE=location.origin+location.pathname;
 const qs=new URLSearchParams(location.search);let room=qs.get('room'),token=qs.get('token');
+const sessionId=qs.get('session')||qs.get('s'),adminToken=qs.get('admin');
 let game=null,channel=null,clockOffset=0,loading=false,pending=false;
 let builtStates='';                 // choice buttons are built once per state set, never rebuilt
-let localPick=null;                 // {choice, round, at}: shown at once, before the server confirms
-let inflight=0;
+let localPick=null;                 // shown at once, before the server confirms
+let inflight=0,advanceKey=null,rejoining=false;
 function msg(s){el('message').textContent=s||''}
 async function rpc(fn,args){const {data,error}=await db.rpc(fn,args);if(error)throw Error(error.message);return data}
 const credentials=()=>({p_room:room,p_token:token});
+const store={get(k){try{return JSON.parse(sessionStorage.getItem(k))}catch{return null}},set(k,v){try{sessionStorage.setItem(k,JSON.stringify(v))}catch{}},del(k){try{sessionStorage.removeItem(k)}catch{}}};
 const questions={
 1:['Q1：真實狀態協調','每一秒結束時，若雙方選擇相同且都等於真實狀態，雙方各得 1 分；否則各得 0 分。'],
 2:['Q2：避開真實狀態','每一秒結束時，若雙方選擇不同，且兩個選擇都不等於真實狀態，雙方各得 1 分；否則各得 0 分。'],
 3:['Q3：持續選對的速度競爭','每一秒結束時，若你目前選擇真實狀態、已連續選對至少 2 秒，且你目前這段連續選對沒有被對手在 2 秒內追上（恰好 2 秒也算追上；或對手目前沒有選對），你得 1 分；否則得 0 分。對手獨立計分。'],
 4:['Q4：選對得分、對手選對扣分','每一秒結束時，若你目前選擇真實狀態，你得 1 分；若對手目前選擇真實狀態，你被扣 1 分。兩人都選對時，你的這一秒合計 0 分。對手的計分方式相同，所以你每多 1 分，對手就少 1 分。']
 };
-async function createGame(){try{
- el('create').disabled=true;
+function readSettings(){
  let states=[...el('states').value.trim().toUpperCase()],rounds=Number(el('rounds').value),seconds=Number(el('seconds').value);
  if(states.length<2||states.length>6||new Set(states).size!==states.length||states.some(s=>!/^[A-Z]$/.test(s))||!Number.isInteger(rounds)||rounds<1||rounds>100||!Number.isInteger(seconds)||seconds<1||seconds>300)throw Error('請輸入 2–6 個不同字母、1–100 回合、1–300 秒');
- let d=await rpc('live_create_v2',{p_states:states,p_rounds:rounds,p_seconds:seconds});room=d.room;token=d.host_token;
- let base=location.origin+location.pathname;
- try{sessionStorage.setItem('guest_'+room,`${base}?room=${room}&token=${d.guest_token}`)}catch{}
- history.replaceState({},'',`${base}?room=${room}&token=${token}`);await enter();
+ return {p_states:states,p_rounds:rounds,p_seconds:seconds};}
+async function createGame(){try{
+ el('create').disabled=true;
+ let d=await rpc('live_create_v2',readSettings());room=d.room;token=d.host_token;
+ try{sessionStorage.setItem('guest_'+room,`${BASE}?room=${room}&token=${d.guest_token}`)}catch{}
+ history.replaceState({},'',`${BASE}?room=${room}&token=${token}`);await enter();
  }catch(e){msg(e.message);el('create').disabled=false}}
+async function createSession(){try{
+ el('createSession').disabled=true;
+ let d=await rpc('live_session_create',readSettings());
+ history.replaceState({},'',`${BASE}?session=${d.session}&admin=${d.admin_token}`);await monitor(d.session,d.admin_token);
+ }catch(e){msg(e.message);el('createSession').disabled=false}}
+
+// ---------- experimenter monitor ----------
+const statusName={matching:'等待配對',waiting:'準備中',ready:'閱讀規則',playing:'進行中',stopped:'已停止',abandoned:'已離開'};
+async function monitor(sid,adm){
+ el('setup').classList.add('hide');el('monitor').classList.remove('hide');
+ el('sessionurl').value=`${BASE}?session=${sid}`;
+ const ago=s=>s==null?'—':(s<60?`${s} 秒前`:`${Math.round(s/60)} 分前`);
+ async function poll(){try{const v=await rpc('live_session_view',{p_session:sid,p_admin:adm});
+  el('sessioninfo').textContent=`S = ${v.states.join('')} · ${v.max_rounds} 回合 · 每回合 ${v.seconds} 秒 · 場次${v.status==='open'?'開放中':'已關閉'}`;
+  let w=0,p=0,d=0;const rows=v.games.map(g=>{const st=g.finished?'已完成':(statusName[g.status]||g.status);
+   if(g.status==='matching')w++;else if(g.finished)d++;else if(['waiting','ready','playing'].includes(g.status))p++;
+   const tr=document.createElement('tr');[g.room,st,`${g.round} / ${g.max_rounds}`,`${ago(g.p1_seen_s)}／${ago(g.p2_seen_s)}`].forEach(x=>{const td=document.createElement('td');td.textContent=x;tr.append(td)});return tr;});
+  el('gamesTable').replaceChildren(...rows);el('nWaiting').textContent=w;el('nPlaying').textContent=p;el('nDone').textContent=d;
+  el('closeSession').disabled=v.status!=='open';msg('');
+ }catch(e){msg(e.message)}}
+ el('closeSession').onclick=async()=>{try{await rpc('live_session_close',{p_session:sid,p_admin:adm,p_stop_games:false});await poll()}catch(e){msg(e.message)}};
+ let armed=null;el('stopSession').onclick=async()=>{const b=el('stopSession');
+  if(!armed){b.textContent='再按一次確認停止全部';b.classList.add('armed');armed=setTimeout(()=>{armed=null;b.textContent='停止所有組並關閉場次';b.classList.remove('armed')},3000);return;}
+  clearTimeout(armed);armed=null;b.textContent='停止所有組並關閉場次';b.classList.remove('armed');
+  try{await rpc('live_session_close',{p_session:sid,p_admin:adm,p_stop_games:true});await poll()}catch(e){msg(e.message)}};
+ el('copySession').onclick=async()=>{try{await navigator.clipboard.writeText(el('sessionurl').value);msg('已複製參與者連結')}catch{msg('請長按網址手動複製')}};
+ await poll();setInterval(()=>{if(!document.hidden)void poll()},3000);
+}
+
+// ---------- participant joins a session ----------
+async function joinSession(sid){
+ el('setup').classList.add('hide');el('game').classList.remove('hide');el('waitcard').classList.remove('hide');el('gamebody').classList.add('hide');
+ try{let seat=store.get('seat_'+sid);
+  if(!seat){const d=await rpc('live_join',{p_session:sid});seat={room:d.room,token:d.token};store.set('seat_'+sid,seat);}
+  room=seat.room;token=seat.token;history.replaceState({},'',`${BASE}?room=${room}&token=${token}&s=${sid}`);await enter();
+ }catch(e){msg(e.message==='Session closed'?'這個場次已經關閉，無法再加入。':e.message)}}
+async function rejoin(){if(rejoining||!sessionId)return;rejoining=true;
+ if(channel){db.removeChannel(channel);channel=null}store.del('seat_'+sessionId);game=null;builtStates='';
+ await joinSession(sessionId);rejoining=false;}
+
 function remaining(){return (!game||!game.started_ms||game.status!=='playing')?0:Math.max(0,game.seconds*1000-(Date.now()+clockOffset-game.started_ms))}
 function updateTimer(){if(!game)return;
  const active=remaining()>0&&game.status==='playing';
- el('timer').textContent=game.status==='stopped'?'已停止':game.status==='ready'?'等待開始':game.status==='waiting'?'尚未開始':(remaining()/1000).toFixed(1)+' 秒';
+ const finished=game.status==='stopped'||(game.round>=game.max_rounds&&game.round_started&&!active);
+ let t=game.status==='stopped'?'已停止':game.status==='ready'?'等待開始':(game.status==='waiting'||game.status==='matching')?'尚未開始':(remaining()/1000).toFixed(1)+' 秒';
+ // auto-matched games: next round starts by itself 5 s after a round ends
+ if(game.session&&game.status==='playing'&&!active&&game.round<game.max_rounds){
+  const left=game.started_ms+(game.seconds+5)*1000-(Date.now()+clockOffset);
+  t=left>0?`下一回合 ${Math.ceil(left/1000)} 秒後開始`:'準備下一回合…';
+  if(left<=0&&advanceKey!==game.round){const k=game.round;advanceKey=k;
+   rpc('live_advance',credentials()).then(()=>refresh()).catch(()=>setTimeout(()=>{if(advanceKey===k)advanceKey=null},1500));}
+ }
+ el('timer').textContent=t;
  document.querySelectorAll('.statebtn').forEach(b=>b.disabled=!active);
  el('ready').disabled=game.status!=='ready'||game.ready_me;
  el('ready').classList.toggle('hide',game.status!=='ready');
- const host=game.player===1, finished=game.status==='stopped'||(game.round>=game.max_rounds&&game.round_started&&!active);
+ const host=game.player===1&&!game.session;
  el('endcard').classList.toggle('hide',!finished);
+ el('home').classList.toggle('hide',!!game.session);
+ el('endtext').textContent=game.session?'謝謝參與！所有紀錄都已保存，可以關閉這個頁面了。':'所有紀錄都已保存在資料庫。';
  el('host').classList.toggle('hide',!host||finished);
  el('prepare').disabled=!host||game.status==='stopped'||game.round>=game.max_rounds||(game.status==='playing'&&active)||game.status==='ready';
  el('start').disabled=!host||game.status!=='ready'||!game.ready_me||!game.ready_opponent;
@@ -70,6 +136,10 @@ function buildChoices(){const key=(game.states||[]).join('');if(key===builtState
  el('choices').replaceChildren();(game.states||[]).forEach(s=>{const b=document.createElement('button');b.textContent=s;b.className='statebtn';b.dataset.state=s;b.addEventListener('click',()=>choose(s));el('choices').append(b)});}
 function render(){
  if(!game)return;
+ if(game.status==='abandoned'){void rejoin();return;}
+ const waiting=game.status==='matching';
+ el('waitcard').classList.toggle('hide',!waiting);el('gamebody').classList.toggle('hide',waiting);
+ if(waiting)return;
  el('seat').textContent='Player '+game.player;
  el('roundlabel').textContent=`Round ${game.round} / ${game.max_rounds} · 每回合 ${game.seconds} 秒`;
  if(game.round===0){el('notice').textContent='尚未產生第一回合';el('qtitle').textContent='等待開始';el('rules').textContent='';}
@@ -79,7 +149,10 @@ function render(){
  el('notice').textContent=(game.framing==='negative'&&ns.length===0)?'你沒有額外資訊。'
   :(game.framing==='negative'?'真實狀態一定不在 ':'真實狀態在 ')+labels+' 之中。';
  }
+ el('ready').textContent=game.session?'我已閱讀，Ready（兩人都按後自動開始）':'我已閱讀，Ready';
  el('readystatus').textContent=game.status==='ready'?`你：${game.ready_me?'Ready':'未 Ready'}；對手：${game.ready_opponent?'Ready':'未 Ready'}`:(game.status==='stopped'?'實驗已停止':'');
+ const away=game.session&&game.opponent_seen_ago_ms!=null&&game.opponent_seen_ago_ms>15000&&game.status!=='stopped';
+ el('connection').textContent=(away?'⚠ 對手可能已離線':'');
  buildChoices();
  let mine=null,theirs=null;const hist=el('history');hist.replaceChildren();
  (game.clicks||[]).forEach(c=>{if(c.player===game.player)mine=c.choice;else theirs=c.choice;
@@ -91,7 +164,7 @@ function render(){
  if(!scoreKey.startsWith(room+':'+game.round+':'))el('scores').textContent='回合結束後顯示。';
  updateTimer();
 }
-async function refresh(){if(loading){pending=true;return;}loading=true;
+async function refresh(){if(!room||!token)return;if(loading){pending=true;return;}loading=true;
  try{let before=Date.now(),data=await rpc('live_view_v2',credentials()),after=Date.now();clockOffset=data.server_ms-(before+after)/2;
  let oldRound=game?.round;game=data;if(oldRound!==data.round){scoreKey='';scoreRetryAt=0;}render();msg('');}
  catch(e){msg(e.message)}finally{loading=false;if(pending){pending=false;void refresh()}}}
@@ -105,17 +178,18 @@ function choose(state){if(!game||remaining()<=0)return;
   .finally(()=>{inflight--;void refresh()});}
 async function action(fn){try{await rpc(fn,credentials());await refresh()}catch(e){msg(e.message)}}
 async function enter(){el('setup').classList.add('hide');el('game').classList.remove('hide');await refresh();if(!game)return;
- if(game.player===1){let link=null;try{link=sessionStorage.getItem('guest_'+room)}catch{}if(link){el('invite').classList.remove('hide');el('guesturl').value=link}}
+ if(game.player===1&&!game.session){el('host').classList.remove('hide');let link=null;try{link=sessionStorage.getItem('guest_'+room)}catch{}if(link){el('invite').classList.remove('hide');el('guesturl').value=link}}
  channel=db.channel('aumann:'+room,{config:{private:false}});
- channel.on('broadcast',{event:'changed'},()=>void refresh()).subscribe(status=>{el('connection').textContent='Realtime: '+status;if(status==='SUBSCRIBED')void refresh()});
+ channel.on('broadcast',{event:'changed'},()=>void refresh()).subscribe(status=>{el('waitconn').textContent='連線：'+status;if(status==='SUBSCRIBED')void refresh()});
 }
 // Stop needs two taps within 3 s (no browser pop-up).
 let stopArmed=null;
 function stopClick(){const b=el('stop');
  if(!stopArmed){b.textContent='再按一次確認停止';b.classList.add('armed');stopArmed=setTimeout(()=>{stopArmed=null;b.textContent='停止實驗';b.classList.remove('armed')},3000);return;}
  clearTimeout(stopArmed);stopArmed=null;b.textContent='停止實驗';b.classList.remove('armed');void action('live_stop_v2');}
-function goHome(){if(channel)db.removeChannel(channel);window.location.href=window.location.origin+window.location.pathname;}
+function goHome(){if(channel)db.removeChannel(channel);window.location.href=BASE;}
 el('create').onclick=createGame;
+el('createSession').onclick=createSession;
 el('ready').onclick=()=>action('live_ready_v2');
 el('prepare').onclick=()=>action('live_prepare_v2');
 el('start').onclick=()=>action('live_start_v2');
@@ -123,7 +197,10 @@ el('stop').onclick=stopClick;
 el('home').onclick=goHome;
 el('copy').onclick=async()=>{try{await navigator.clipboard.writeText(el('guesturl').value);msg('已複製 Player 2 連結')}catch{msg('請長按網址手動複製')}};
 setInterval(updateTimer,50);
-setInterval(()=>{if(room&&token&&!document.hidden)void refresh()},4000);
+setInterval(()=>{if(room&&token&&!document.hidden)void refresh()},4000);   // also the "I am online" heartbeat
+setInterval(()=>{if(room&&token&&game?.status==='matching')void refresh()},1500);   // waiting room: notice a new partner quickly
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&room&&token)void refresh()});
 if(room&&token)void enter();
+else if(sessionId&&adminToken)void monitor(sessionId,adminToken);
+else if(sessionId)void joinSession(sessionId);
 </script></body></html>
