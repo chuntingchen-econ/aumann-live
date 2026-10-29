@@ -73,8 +73,9 @@ function render(){
  el('roundlabel').textContent=`Round ${game.round} / ${game.max_rounds} · 每回合 ${game.seconds} 秒`;
  if(game.round===0){el('notice').textContent='尚未產生第一回合';el('qtitle').textContent='等待開始';el('rules').textContent='';}
  else{el('qtitle').textContent=questions[game.question][0];el('rules').textContent=questions[game.question][1];
- const labels=(game.notice_states||[]).join('、');
- el('notice').textContent=(game.framing==='negative'?'真實狀態一定不在 ':'真實狀態在 ')+labels+' 之中。';
+ const ns=game.notice_states||[],labels=ns.join('、');
+ el('notice').textContent=(game.framing==='negative'&&ns.length===0)?'你沒有額外資訊。'
+  :(game.framing==='negative'?'真實狀態一定不在 ':'真實狀態在 ')+labels+' 之中。';
  }
  el('readystatus').textContent=game.status==='ready'?`你：${game.ready_me?'Ready':'未 Ready'}；對手：${game.ready_opponent?'Ready':'未 Ready'}`:(game.status==='stopped'?'實驗已停止':'');
  buildChoices();
