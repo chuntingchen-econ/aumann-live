@@ -92,12 +92,14 @@ async function refresh(){if(loading){pending=true;return;}loading=true;
  try{let before=Date.now(),data=await rpc('live_view_v2',credentials()),after=Date.now();clockOffset=data.server_ms-(before+after)/2;
  let oldRound=game?.round;game=data;if(oldRound!==data.round){scoreKey='';scoreRetryAt=0;}render();msg('');}
  catch(e){msg(e.message)}finally{loading=false;if(pending){pending=false;void refresh()}}}
-// Every tap is sent immediately (no lock), so fast switches are all recorded with server time.
-async function choose(state){if(!game||remaining()<=0)return;
+// Every tap is kept (no lock) and sent in tap order through a queue, so fast switches are all
+// recorded and the last tap is always the last one the server sees.
+let clickQueue=Promise.resolve();
+function choose(state){if(!game||remaining()<=0)return;
  localPick={choice:state,round:game.round};inflight++;render();
- try{await rpc('live_choose',{...credentials(),p_choice:state})}
- catch(e){msg('這次點選沒有被記錄：'+e.message)}
- finally{inflight--;void refresh()}}
+ clickQueue=clickQueue.then(()=>rpc('live_choose',{...credentials(),p_choice:state}))
+  .catch(e=>msg('這次點選沒有被記錄：'+e.message))
+  .finally(()=>{inflight--;void refresh()});}
 async function action(fn){try{await rpc(fn,credentials());await refresh()}catch(e){msg(e.message)}}
 async function enter(){el('setup').classList.add('hide');el('game').classList.remove('hide');await refresh();if(!game)return;
  if(game.player===1){let link=null;try{link=sessionStorage.getItem('guest_'+room)}catch{}if(link){el('invite').classList.remove('hide');el('guesturl').value=link}}
