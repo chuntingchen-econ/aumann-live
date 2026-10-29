@@ -18,7 +18,7 @@
 <section id="waitcard" class="card hide"><h2>正在等待另一位參與者…</h2><p class="muted">請保持這個頁面開啟。配對成功後會自動進入第一回合。</p><p id="waitconn" class="muted"></p></section>
 <div id="gamebody">
 <section id="endcard" class="card hide"><h2>實驗已結束</h2><p id="endtext" class="muted">所有紀錄都已保存在資料庫。</p><button id="home" class="main">返回首頁／建立新遊戲</button></section>
-<section class="card"><b id="seat"></b><p id="roundlabel" class="muted"></p><h2>本回合資訊</h2><div id="notice" class="big">—</div><p id="connection" class="muted"></p></section>
+<section class="card"><b id="seat"></b><p id="roundlabel" class="muted"></p><p id="stateset"></p><h2>本回合資訊</h2><div id="notice" class="big">—</div><p id="connection" class="muted"></p></section>
 <section class="card"><h2 id="qtitle">題目</h2><p id="rules"></p><p class="muted">每秒結束時以當時有效選擇計分；未選擇時為 0 分。</p><div id="readystatus" class="muted"></div><button id="ready" class="main">我已閱讀，Ready</button></section>
 <section id="playpanel" class="card"><h2>選擇狀態</h2><div id="timer" class="timer">—</div><div id="choices" class="choices"></div><div class="pair" style="margin-top:16px"><div><span class="muted">你的最新選擇</span><div id="mine" class="big">—</div></div><div><span class="muted">對手最新選擇</span><div id="theirs" class="big">—</div></div></div></section>
 <section class="card"><h2>即時點選紀錄</h2><div id="history" class="history"></div></section>
@@ -155,6 +155,7 @@ function render(){
  if(waiting)return;
  el('seat').textContent='Player '+game.player;
  el('roundlabel').textContent=`Round ${game.round} / ${game.max_rounds} · 每回合 ${game.seconds} 秒`;
+ el('stateset').textContent=`可能的真實狀態有 ${(game.states||[]).join('、')}，共 ${(game.states||[]).length} 種。每回合從中隨機抽出一個作為真實狀態，兩人相同。`;
  if(game.round===0){el('notice').textContent='尚未產生第一回合';el('qtitle').textContent='等待開始';el('rules').textContent='';}
  else{const qd=questions[game.question]||[`Q${game.question}`,''];el('qtitle').textContent=qd[0];
  el('rules').textContent=qd[1]+(game.question===4?`本回合開始時你有 ${game.seconds} 分底分，最低 0 分。`:'');
