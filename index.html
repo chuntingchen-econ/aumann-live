@@ -1,9 +1,9 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aumann Live</title><style>
-:root{font-family:system-ui,-apple-system,sans-serif;color:#20222a;background:#f4f5f7}body{max-width:560px;margin:auto;padding:14px}h1{font-size:25px}h2{font-size:19px}.card{background:#fff;border-radius:14px;padding:17px;margin:12px 0;box-shadow:0 1px 5px #ddd}input{box-sizing:border-box;width:100%;padding:12px;font-size:17px;border:1px solid #c5c8d0;border-radius:8px}label{display:block;margin:10px 0 5px;font-weight:600}button{padding:13px;border:1px solid #bbb;border-radius:10px;font-size:16px;background:#fff;cursor:pointer}button.main{background:#223149;color:#fff;border-color:#223149}button.danger{border-color:#a23426;color:#a23426}button.danger.armed{background:#a23426;color:#fff}button:disabled{opacity:.35}button:active{transform:scale(.98)}.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(62px,1fr));gap:9px}.choices button{font-size:22px;font-weight:650;touch-action:manipulation}.choices button,.oppbtn{color:#a3a8b2}.oppbtn{display:flex;align-items:center;justify-content:center;padding:13px;border:1px solid #bbb;border-radius:10px;font-size:22px;font-weight:650;background:#fff}.choices .picked{outline:3px solid #223149;color:#10131a;font-weight:800}.rowlabel{margin:14px 0 6px;color:#626b78;font-size:15px;font-weight:600}.big{font-size:30px;font-weight:700}.timer{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums}.muted{color:#626b78}.hide{display:none}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pair>div{background:#f1f2f5;border-radius:10px;padding:14px;text-align:center}.history{max-height:185px;overflow-y:auto;line-height:1.8}.warn{color:#a23426}.controls{display:flex;gap:10px;flex-wrap:wrap}#message{white-space:pre-wrap}#endcard{border:2px solid #223149}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:6px 4px;border-bottom:1px solid #e3e5ea}th{color:#626b78;font-weight:600}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.stats>div{background:#f1f2f5;border-radius:10px;padding:10px;text-align:center}.stats b{display:block;font-size:24px}#sessioncode{letter-spacing:.12em}.lead{font-size:18px;line-height:1.6;margin:14px 0 6px}#notice{font-size:18px;line-height:1.6;margin:6px 0}#rules{font-size:21px;line-height:1.7;font-weight:500;color:#20222a}
+:root{font-family:system-ui,-apple-system,sans-serif;color:#20222a;background:#f4f5f7}body{max-width:560px;margin:auto;padding:14px}h1{font-size:25px}h2{font-size:19px}.card{background:#fff;border-radius:14px;padding:17px;margin:12px 0;box-shadow:0 1px 5px #ddd}input{box-sizing:border-box;width:100%;padding:12px;font-size:17px;border:1px solid #c5c8d0;border-radius:8px}label{display:block;margin:10px 0 5px;font-weight:600}button{padding:13px;border:1px solid #bbb;border-radius:10px;font-size:16px;background:#fff;cursor:pointer}button.main{background:#223149;color:#fff;border-color:#223149}button.danger{border-color:#a23426;color:#a23426}button.danger.armed{background:#a23426;color:#fff}button:disabled{opacity:.35}button:active{transform:scale(.98)}.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(62px,1fr));gap:9px}.choices button{font-size:22px;font-weight:650;touch-action:manipulation}.choices button,.oppbtn{color:#a3a8b2}.oppbtn{display:flex;align-items:center;justify-content:center;padding:13px;border:1px solid #bbb;border-radius:10px;font-size:22px;font-weight:650;background:#fff}.choices .picked{outline:3px solid #223149;color:#10131a;font-weight:800}.rowlabel{margin:14px 0 6px;color:#626b78;font-size:15px;font-weight:600}.big{font-size:30px;font-weight:700}.timer{font-size:44px;font-weight:700;font-variant-numeric:tabular-nums}.muted{color:#626b78}.hide{display:none}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pair>div{background:#f1f2f5;border-radius:10px;padding:14px;text-align:center}.history{max-height:185px;overflow-y:auto;line-height:1.8}.warn{color:#a23426}.controls{display:flex;gap:10px;flex-wrap:wrap}#message{white-space:pre-wrap}#endcard{border:2px solid #223149}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:6px 4px;border-bottom:1px solid #e3e5ea}th{color:#626b78;font-weight:600}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.stats>div{background:#f1f2f5;border-radius:10px;padding:10px;text-align:center}.stats b{display:block;font-size:24px}#sessioncode{letter-spacing:.12em}.lead{font-size:18px;line-height:1.6;margin:14px 0 6px}#notice{font-size:18px;line-height:1.6;margin:6px 0}#rules{font-size:21px;line-height:1.7;font-weight:500;color:#20222a}#result{margin:10px 0 4px}.qpick{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin:4px 0}.qpick label{display:flex;align-items:center;gap:8px;margin:0;font-weight:500;font-size:15px}.qpick input{width:20px;height:20px;margin:0;flex:none}#result .pair b{display:block;font-size:32px;margin-top:4px;font-variant-numeric:tabular-nums}
 </style></head><body>
 <h1>🎲 Aumann Live</h1>
 <div id="joinbox" class="card"><h2>參加實驗</h2><label for="joincode">請輸入實驗者給你的代碼</label><input id="joincode" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="例如 4821"><div class="controls" style="margin-top:12px"><button id="joinBtn" class="main">加入</button></div></div>
-<div id="setup" class="card hide"><h2>實驗者：建立實驗</h2><label for="states">狀態集合 S</label><input id="states" value="ABCD" maxlength="6"><label for="rounds">總回合數</label><input id="rounds" type="number" value="4" min="1" max="100"><label for="seconds">每回合秒數</label><input id="seconds" type="number" value="15" min="1" max="300"><p class="muted">題目 Q1、Q2、Q3、Q4、Q5 依序循環。每回合重新抽取真實狀態和兩人的資訊。</p>
+<div id="setup" class="card hide"><h2>實驗者：建立實驗</h2><label for="states">狀態集合 S</label><input id="states" value="ABCD" maxlength="6"><label for="rounds">總回合數</label><input id="rounds" type="number" value="4" min="1" max="100"><label for="seconds">每回合秒數</label><input id="seconds" type="number" value="15" min="1" max="300"><label>題目集（勾選要用的題目）</label><div id="qpick" class="qpick"></div><p class="muted">回合會在勾選的題目之間，依題號順序循環。例如勾 Q1、Q5、Q6，就是 Q1→Q5→Q6→Q1…。每回合重新抽取真實狀態和兩人的資訊。</p>
 <label for="newcode">加入代碼（3–12 個英文或數字；留空會自動產生 4 位數）</label><input id="newcode" autocomplete="off" maxlength="12" placeholder="留空自動產生">
 <div class="controls" style="margin-top:12px"><button id="createSession" class="main">建立自動配對場次</button><button id="create">建立單一雙人遊戲（手動）</button></div>
 <p class="muted">自動配對：把加入代碼告訴所有參與者，輸入代碼的人依到達順序兩兩配對，配對後雙方按 Ready 就自動開始。</p></div>
@@ -20,7 +20,7 @@
 <section id="endcard" class="card hide"><h2>實驗已結束</h2><p id="endtext" class="muted">所有紀錄都已保存在資料庫。</p><button id="home" class="main">返回首頁／建立新遊戲</button></section>
 <section class="card"><b id="seat"></b><p id="roundlabel" class="muted"></p><p id="stateset" class="lead"></p><div id="notice" class="big">—</div><p id="otherinfo" class="lead">除了你之外，你的對手也知道關於真實狀態的某些資訊。</p><p id="connection" class="muted"></p></section>
 <section class="card"><h2 id="qtitle">題目</h2><p id="rules"></p><p class="muted">未選擇時為 0 分。</p><div id="readystatus" class="muted"></div><button id="ready" class="main">我已閱讀，Ready</button></section>
-<section id="playpanel" class="card"><h2>選擇狀態</h2><div id="timer" class="timer">—</div><p class="rowlabel">對手</p><div id="oppchoices" class="choices"></div><p class="rowlabel">你</p><div id="choices" class="choices"></div></section>
+<section id="playpanel" class="card"><h2>選擇狀態</h2><div id="timer" class="timer">—</div><div id="result" class="hide"><p id="resultlabel" class="rowlabel"></p><div class="pair"><div><span class="muted">你</span><b id="resme">—</b></div><div><span class="muted">對手</span><b id="resopp">—</b></div></div><p id="resultnote" class="muted"></p></div><p class="rowlabel">對手</p><div id="oppchoices" class="choices"></div><p class="rowlabel">你</p><div id="choices" class="choices"></div></section>
 <section id="host" class="card hide"><h2>Player 1 控制</h2><div id="invite" class="hide"><label>Player 2 專屬網址</label><input id="guesturl" readonly><button id="copy">複製 Player 2 連結</button></div><div class="controls" style="margin-top:12px"><button class="main" id="prepare">準備下一回合</button><button class="main" id="start">雙方 Ready，開始計時</button><button class="danger" id="stop">停止實驗</button></div></section>
 </div></div>
 <p id="message" class="warn"></p>
@@ -47,15 +47,24 @@ const questions={
 2:['Q2：避開真實狀態','每一秒結束時，若雙方選擇不同，且兩個選擇都不等於真實狀態，雙方各得 1 分；否則各得 0 分。'],
 3:['Q3：持續選對的速度競爭','每一秒結束時，若你目前選擇真實狀態、已連續選對至少 2 秒，且你目前這段連續選對沒有被對手在 2 秒內追上（恰好 2 秒也算追上；或對手目前沒有選對），你得 1 分；否則得 0 分。對手獨立計分。'],
 4:['Q4：選對得分、對手選對扣分','每一秒結束時，若你目前選擇真實狀態，你得 1 分；若對手目前選擇真實狀態，你被扣 1 分。'],
-5:['Q5：自己選對得分','每一秒結束時，若你目前選擇真實狀態，你得 1 分。']
+5:['Q5：自己選對得分','每一秒結束時，若你目前選擇真實狀態，你得 1 分。'],
+6:['Q6：自己選錯得分','每一秒結束時，若你目前選擇非真實狀態，你得 1 分。'],
+7:['Q7：對手選對得分','每一秒結束時，若對手目前選擇真實狀態，你得 1 分。'],
+8:['Q8：對手選錯得分','每一秒結束時，若對手目前選擇非真實狀態，你得 1 分。']
 };
+// experimenter's question-set picker (Q1–Q5 ticked by default, as before)
+el('qpick').replaceChildren(...Object.entries(questions).map(([n,q])=>{const l=document.createElement('label');const c=document.createElement('input');
+ c.type='checkbox';c.value=n;c.checked=Number(n)<=5;l.append(c,q[0]);return l}));
+el('qpick').addEventListener('change',()=>msg(''));
+const pickedQuestions=()=>[...document.querySelectorAll('#qpick input:checked')].map(c=>Number(c.value)).sort((a,b)=>a-b);
 function readSettings(){
  let states=[...el('states').value.trim().toUpperCase()],rounds=Number(el('rounds').value),seconds=Number(el('seconds').value);
  if(states.length<2||states.length>6||new Set(states).size!==states.length||states.some(s=>!/^[A-Z]$/.test(s))||!Number.isInteger(rounds)||rounds<1||rounds>100||!Number.isInteger(seconds)||seconds<1||seconds>300)throw Error('請輸入 2–6 個不同字母、1–100 回合、1–300 秒');
- return {p_states:states,p_rounds:rounds,p_seconds:seconds};}
+ const qset=pickedQuestions();if(!qset.length)throw Error('請至少勾選一個題目');
+ return {p_states:states,p_rounds:rounds,p_seconds:seconds,p_questions:qset};}
 async function createGame(){try{
  el('create').disabled=true;
- let d=await rpc('live_create_v2',readSettings());room=d.room;token=d.host_token;
+ let d=await rpc('live_create_v3',readSettings());room=d.room;token=d.host_token;
  try{sessionStorage.setItem('guest_'+room,`${BASE}?room=${room}&token=${d.guest_token}`)}catch{}
  history.replaceState({},'',`${BASE}?room=${room}&token=${token}`);await enter();
  }catch(e){msg(e.message);el('create').disabled=false}}
@@ -63,7 +72,7 @@ async function createSession(){try{
  el('createSession').disabled=true;
  const code=el('newcode').value.trim().toUpperCase();
  if(code&&!/^[A-Z0-9]{3,12}$/.test(code))throw Error('加入代碼請用 3–12 個英文字母或數字');
- let d=await rpc('live_session_create_v2',{...readSettings(),p_code:code||null});
+ let d=await rpc('live_session_create_v3',{...readSettings(),p_code:code||null});
  history.replaceState({},'',`${BASE}?session=${d.session}&admin=${d.admin_token}`);await monitor(d.session,d.admin_token);
  }catch(e){msg(e.message==='Code in use'?'這個代碼正被另一個開放中的場次使用，請換一個。':e.message);el('createSession').disabled=false}}
 
@@ -75,7 +84,7 @@ async function monitor(sid,adm){
  const ago=s=>s==null?'—':(s<60?`${s} 秒前`:`${Math.round(s/60)} 分前`);
  async function poll(){try{const v=await rpc('live_session_view',{p_session:sid,p_admin:adm});
   el('sessioncode').textContent=v.code||'—';
-  el('sessioninfo').textContent=`S = ${v.states.join('')} · ${v.max_rounds} 回合 · 每回合 ${v.seconds} 秒 · 場次${v.status==='open'?'開放中':'已關閉'}`;
+  el('sessioninfo').textContent=`S = ${v.states.join('')} · ${v.max_rounds} 回合 · 每回合 ${v.seconds} 秒 · 題目 ${(v.questions||[1,2,3,4,5]).map(n=>'Q'+n).join('→')} · 場次${v.status==='open'?'開放中':'已關閉'}`;
   let w=0,p=0,d=0;const rows=v.games.map(g=>{const st=g.finished?'已完成':(statusName[g.status]||g.status);
    if(g.status==='matching')w++;else if(g.finished)d++;else if(['waiting','ready','playing'].includes(g.status))p++;
    const tr=document.createElement('tr');[g.room,st,`${g.round} / ${g.max_rounds}`,`${ago(g.p1_seen_s)}／${ago(g.p2_seen_s)}`].forEach(x=>{const td=document.createElement('td');td.textContent=x;tr.append(td)});return tr;});
@@ -122,7 +131,7 @@ function updateTimer(){if(!game)return;
   if(left<=0&&advanceKey!==game.round){const k=game.round;advanceKey=k;
    rpc('live_advance',credentials()).then(()=>refresh()).catch(()=>setTimeout(()=>{if(advanceKey===k)advanceKey=null},1500));}
  }
- el('timer').textContent=t;
+ el('timer').textContent=t;renderResult();
  document.querySelectorAll('.statebtn').forEach(b=>b.disabled=!active);
  el('ready').disabled=game.status!=='ready'||game.ready_me;
  el('ready').classList.toggle('hide',game.status!=='ready');
@@ -141,13 +150,20 @@ function updateTimer(){if(!game)return;
  el('prepare').classList.toggle('hide',game.status==='ready');
 }
 let homeAt=0;
-let scoreKey='',scoreLoading=false,scoreRetryAt=0;
-async function showScore(){if(scoreLoading||!game)return;const key=room+':'+game.round+':'+game.status;if(scoreKey===key||Date.now()<scoreRetryAt)return;
- scoreLoading=true;try{let d=await rpc('live_score',{...credentials(),p_round:game.round});
- const me=game.player-1;
- el('scores').textContent=`你：${d.scores[me]} 分；對手：${d.scores[1-me]} 分`+(d.base?`（含底分 ${d.base} 分）`:'')+(d.stopped_early?`（實驗中途停止，只計前 ${d.seconds_scored} 秒）`:'');
- scoreKey=key;
- }catch(e){scoreRetryAt=Date.now()+1000;/* server clock may not have passed the cutoff yet */}finally{scoreLoading=false}}
+// Round result: both players' payoff, shown once the round is over and kept while the next round's
+// rules are being read. Fetched once per round; the server refuses until its clock passes the end.
+const results={};let resLoading=false,resRetryAt=0;
+async function loadResult(r){const k=room+':'+r;if(results[k]||resLoading||Date.now()<resRetryAt)return;resLoading=true;
+ try{results[k]=await rpc('live_round_result',{...credentials(),p_round:r});}catch(e){resRetryAt=Date.now()+1000}finally{resLoading=false}}
+function renderResult(){if(!game)return;
+ const over=game.round_started&&(game.status==='stopped'||(game.status==='playing'&&remaining()<=0));
+ let r=null,label='';
+ if(over){r=game.round;label=`Round ${r} 結果`}
+ else if(game.status==='ready'&&game.round>1){r=game.round-1;label=`上一回合（Round ${r}）結果`}
+ const d=r?results[room+':'+r]:null;if(r&&!d)void loadResult(r);
+ el('result').classList.toggle('hide',!d);if(!d)return;
+ el('resultlabel').textContent=label;el('resme').textContent=`${d.me} 分`;el('resopp').textContent=`${d.opponent} 分`;
+ el('resultnote').textContent=d.stopped_early?`實驗中途停止，只計前 ${d.seconds_scored} 秒。`:'';}
 function buildChoices(){const key=(game.states||[]).join('');if(key===builtStates)return;builtStates=key;
  el('oppchoices').replaceChildren(...(game.states||[]).map(s=>{const d=document.createElement('div');d.textContent=s;d.className='oppbtn';d.dataset.state=s;return d}));
  el('choices').replaceChildren();(game.states||[]).forEach(s=>{const b=document.createElement('button');b.textContent=s;b.className='statebtn';b.dataset.state=s;b.addEventListener('click',()=>choose(s));el('choices').append(b)});}
@@ -181,7 +197,7 @@ function render(){
 }
 async function refresh(){if(!room||!token)return;if(loading){pending=true;return;}loading=true;
  try{let before=Date.now(),data=await rpc('live_view_v2',credentials()),after=Date.now();clockOffset=data.server_ms-(before+after)/2;
- let oldRound=game?.round;game=data;if(oldRound!==data.round){scoreKey='';scoreRetryAt=0;}render();msg('');}
+ game=data;render();msg('');}
  catch(e){msg(e.message)}finally{loading=false;if(pending){pending=false;void refresh()}}}
 // Every tap is kept (no lock) and sent in tap order through a queue, so fast switches are all
 // recorded and the last tap is always the last one the server sees.
