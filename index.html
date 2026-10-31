@@ -128,14 +128,19 @@ function updateTimer(){if(!game)return;
  el('ready').classList.toggle('hide',game.status!=='ready');
  const host=game.player===1&&!game.session;
  el('endcard').classList.toggle('hide',!finished);
- el('home').classList.toggle('hide',!!game.session);
- el('endtext').textContent=game.session?'謝謝參與！所有紀錄都已保存，可以關閉這個頁面了。':'所有紀錄都已保存在資料庫。';
+ // when the game is over, go back to the start page by itself after 10 s (or at once with the button)
+ if(finished&&!homeAt)homeAt=Date.now()+10000;
+ const homeLeft=homeAt?Math.max(0,Math.ceil((homeAt-Date.now())/1000)):0;
+ el('home').textContent=`回到首頁（${homeLeft} 秒後自動返回）`;
+ el('endtext').textContent='謝謝參與！所有紀錄都已保存。';
+ if(homeAt&&Date.now()>=homeAt){homeAt=Infinity;goHome();return;}
  el('host').classList.toggle('hide',!host||finished);
  el('prepare').disabled=!host||game.status==='stopped'||game.round>=game.max_rounds||(game.status==='playing'&&active)||game.status==='ready';
  el('start').disabled=!host||game.status!=='ready'||!game.ready_me||!game.ready_opponent;
  el('start').classList.toggle('hide',game.status!=='ready');
  el('prepare').classList.toggle('hide',game.status==='ready');
 }
+let homeAt=0;
 let scoreKey='',scoreLoading=false,scoreRetryAt=0;
 async function showScore(){if(scoreLoading||!game)return;const key=room+':'+game.round+':'+game.status;if(scoreKey===key||Date.now()<scoreRetryAt)return;
  scoreLoading=true;try{let d=await rpc('live_score',{...credentials(),p_round:game.round});
