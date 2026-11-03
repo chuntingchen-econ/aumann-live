@@ -3,7 +3,7 @@
 </style></head><body>
 <h1>🎲 Aumann Live</h1>
 <div id="joinbox" class="card"><h2>參加實驗</h2><label for="joincode">請輸入實驗者給你的代碼</label><input id="joincode" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="例如 4821"><div class="controls" style="margin-top:12px"><button id="joinBtn" class="main">加入</button></div></div>
-<div id="setup" class="card hide"><h2>實驗者：建立實驗</h2><label for="states">狀態集合 S</label><input id="states" value="ABCD" maxlength="6"><label for="rounds">總回合數</label><input id="rounds" type="number" value="4" min="1" max="100"><label for="seconds">每回合秒數</label><input id="seconds" type="number" value="15" min="1" max="300"><label>出題方式</label><div class="modes"><label><input type="radio" name="qmode" value="same" checked>兩人同題，依序輪動</label><label><input type="radio" name="qmode" value="pairs">指定題目組合（兩人可以不同題）</label><label><input type="radio" name="qmode" value="pool">題目池：從勾選的題目隨機抽題（兩人可同題或各自抽）</label></div><div id="qpickbox"><label id="qpicklabel">題目（勾選要用的題目）</label><div id="qpick" class="qpick"></div><p id="qpicknote" class="muted"></p></div><div id="poolopts" class="hide"><label>題目池：兩人的題目</label><div class="modes"><label><input type="radio" name="poolsame" value="diff" checked>各自抽（兩人可能不同題）</label><label><input type="radio" name="poolsame" value="same">抽一題兩人共用（兩人一定同題）</label><label><input type="checkbox" id="tellsame" disabled>告訴受試者「對手的題目和你相同」（只能搭配「兩人共用」；不勾的話，受試者看到的畫面和「各自抽」完全一樣）</label></div></div><div id="pairsbox" class="hide"><label for="qpairs">題目組合（Player 1／Player 2）</label><input id="qpairs" autocomplete="off" placeholder="例如 5/6, 6/5, 7/8"><p class="muted">每一組斜線左邊是 Player 1、右邊是 Player 2，回合依序輪動；寫 5 或 5/5 代表兩人同題。受試者只看到自己的題目。</p></div><p class="muted">每回合重新抽取真實狀態和兩人的資訊。</p>
+<div id="setup" class="card hide"><h2>實驗者：建立實驗</h2><label for="states">狀態集合 S</label><input id="states" value="ABCD" maxlength="6"><label for="rounds">總回合數</label><input id="rounds" type="number" value="4" min="1" max="100"><label for="seconds">每回合秒數</label><input id="seconds" type="number" value="15" min="1" max="300"><label>出題方式</label><div class="modes"><label><input type="radio" name="qmode" value="same" checked>兩人同題，依序輪動</label><label><input type="radio" name="qmode" value="pairs">指定每回合的題目（兩人可以不同題，可設候選題目）</label><label><input type="radio" name="qmode" value="pool">題目池：從勾選的題目隨機抽題（兩人可同題或各自抽）</label></div><div id="qpickbox"><label id="qpicklabel">題目（勾選要用的題目）</label><div id="qpick" class="qpick"></div><p id="qpicknote" class="muted"></p></div><div id="poolopts" class="hide"><label>題目池：兩人的題目</label><div class="modes"><label><input type="radio" name="poolsame" value="diff" checked>各自抽（兩人可能不同題）</label><label><input type="radio" name="poolsame" value="same">抽一題兩人共用（兩人一定同題）</label><label><input type="checkbox" id="tellsame" disabled>告訴受試者「對手的題目和你相同」（只能搭配「兩人共用」；不勾的話，受試者看到的畫面和「各自抽」完全一樣）</label></div></div><div id="pairsbox" class="hide"><label for="qpairs">每回合的題目（Player 1／Player 2）</label><input id="qpairs" autocomplete="off" placeholder="例如 5/6, 5/7, 5/6|7"><p class="muted">每一組代表一個回合，回合依序輪動。斜線左邊是 Player 1、右邊是 Player 2；寫 5 或 5/5 代表兩人同題。用 | 列出候選題目，該回合從中等機率抽一題，例如 5/6|7 是 Player 1 做 Q5、Player 2 從 Q6、Q7 抽一題。</p><div class="modes"><label><input type="checkbox" id="showopp1">告訴 Player 1：對手（Player 2）本回合可能的題目</label><label><input type="checkbox" id="showopp2">告訴 Player 2：對手（Player 1）本回合可能的題目</label></div><p class="muted">勾了之後，受試者會看到「對手本回合的題目」卡片：對手只有一個候選時，他就知道對手的題目；有多個候選時，看到「是下列其中之一」。不勾的話，受試者只看到自己的題目。</p></div><p class="muted">每回合重新抽取真實狀態和兩人的資訊。</p>
 <label for="newcode">加入代碼（3–12 個英文或數字；留空會自動產生 4 位數）</label><input id="newcode" autocomplete="off" maxlength="12" placeholder="留空自動產生">
 <div class="controls" style="margin-top:12px"><button id="createSession" class="main">建立自動配對場次</button><button id="create">建立單一雙人遊戲（手動）</button></div>
 <p class="muted">自動配對：把加入代碼告訴所有參與者，輸入代碼的人依到達順序兩兩配對，配對後雙方按 Ready 就自動開始。</p><h2 style="margin-top:26px">管理開放中的場次</h2><label for="adminpw">實驗者密碼</label><input id="adminpw" type="password" autocomplete="current-password"><div class="controls" style="margin-top:12px"><button id="listSessions">顯示開放中的場次</button></div><div id="sessionlist"></div><p class="muted">「關閉場次」：不再接受新的參與者，並釋出加入代碼；進行中的組可以玩完。「全部停止」：連進行中的組也一起停止。</p></div>
@@ -62,10 +62,14 @@ const mixedRules={
 2:'每一秒結束時，若你和對手目前選擇不同，且兩個選擇都不等於真實狀態，你得 1 分。',
 3:'每一秒結束時，若你目前選擇真實狀態、已連續選對至少 2 秒，且你目前這段連續選對沒有被對手在 2 秒內追上（恰好 2 秒也算追上；或對手目前沒有選對），你得 1 分；否則得 0 分。'};
 const qdesc=x=>x.pool?`題目池 ${x.pool.map(n=>'Q'+n).join('、')}（${x.pool_same?'兩人同題':'每回合各自抽'}${x.pool_tell_same?'，告知同題':''}）`
+ :x.spec?'題目 '+x.spec.map(([a,b])=>`Q${a.join('|')}/Q${b.join('|')}`).join('→')
+   +((x.show_opp1||x.show_opp2)?`（告知${x.show_opp1&&x.show_opp2?' P1、P2':x.show_opp1?' P1':' P2'} 對手可能的題目）`:'')
  :'題目 '+(x.questions||[1,2,3,4,5]).map((n,i)=>x.questions2?`Q${n}/Q${x.questions2[i]}`:`Q${n}`).join('→');
-function parsePairs(txt){const toks=txt.trim().replace(/\s*[\/／]\s*/g,'/').split(/[,，、;；\s]+/).filter(Boolean);const q1=[],q2=[];
- for(const t of toks){const m=t.match(/^([1-8])(?:\/([1-8]))?$/);if(!m)throw Error(`題目組合「${t}」看不懂，請寫成 5/6 這樣（題號 1–8）`);q1.push(Number(m[1]));q2.push(Number(m[2]||m[1]));}
- if(!q1.length||q1.length>60)throw Error('題目組合請寫 1–60 組');return {q1,q2};}
+// "5/6, 5/7, 5/6|7" -> [[[5],[6]], [[5],[7]], [[5],[6,7]]]   (left = Player 1, right = Player 2, | = candidates)
+function parseSpec(txt){const toks=txt.trim().replace(/\s*([\/／|｜])\s*/g,'$1').replace(/／/g,'/').replace(/｜/g,'|').split(/[,，、;；\s]+/).filter(Boolean);
+ const side=(x,t)=>{const a=x.split('|').map(Number);if(!x||a.some(n=>!Number.isInteger(n)||n<1||n>8)||new Set(a).size!==a.length)throw Error(`「${t}」看不懂：題號要是 1–8，候選題目用 | 分開、不要重複`);return a};
+ const spec=toks.map(t=>{const parts=t.split('/');if(parts.length>2)throw Error(`「${t}」看不懂，請寫成 5/6 或 5/6|7 這樣`);const a=side(parts[0],t);return [a,parts.length===2?side(parts[1],t):a.slice()];});
+ if(!spec.length||spec.length>60)throw Error('請寫 1–60 個回合');return spec;}
 const pickedQuestions=()=>[...document.querySelectorAll('#qpick input:checked')].map(c=>Number(c.value)).sort((a,b)=>a-b);
 const qmode=()=>document.querySelector('input[name=qmode]:checked').value;
 const modeNote={same:'回合會在勾選的題目之間，依題號順序循環。例如勾 Q1、Q5、Q6，就是 Q1→Q5→Q6→Q1…。',
@@ -79,12 +83,12 @@ function readSettings(){
  let states=[...el('states').value.trim().toUpperCase()],rounds=Number(el('rounds').value),seconds=Number(el('seconds').value);
  if(states.length<2||states.length>6||new Set(states).size!==states.length||states.some(s=>!/^[A-Z]$/.test(s))||!Number.isInteger(rounds)||rounds<1||rounds>100||!Number.isInteger(seconds)||seconds<1||seconds>300)throw Error('請輸入 2–6 個不同字母、1–100 回合、1–300 秒');
  const base={p_states:states,p_rounds:rounds,p_seconds:seconds},m=qmode();
- if(m==='pairs'){const t=el('qpairs').value.trim();if(!t)throw Error('請輸入題目組合，例如 5/6, 6/5');const {q1,q2}=parsePairs(t);return {base,pairs:{p_q1:q1,p_q2:q2}};}
+ if(m==='pairs'){const t=el('qpairs').value.trim();if(!t)throw Error('請輸入每回合的題目，例如 5/6, 5/7, 5/6|7');return {base,spec:{p_spec:parseSpec(t),p_show1:el('showopp1').checked,p_show2:el('showopp2').checked}};}
  const q=pickedQuestions();if(!q.length)throw Error(m==='pool'?'請至少勾選一個題目放進題目池':'請至少勾選一個題目');
  return m==='pool'?{base,pool:{p_pool:q,p_same:poolSame(),p_tell_same:poolSame()&&el('tellsame').checked}}:{base,pairs:{p_q1:q,p_q2:q}};}
 async function createGame(){try{
  el('create').disabled=true;
- const st=readSettings();let d=st.pool?await rpc('live_create_pool2',{...st.base,...st.pool}):await rpc('live_create_v4',{...st.base,...st.pairs});room=d.room;token=d.host_token;
+ const st=readSettings();let d=st.pool?await rpc('live_create_pool2',{...st.base,...st.pool}):st.spec?await rpc('live_create_spec',{...st.base,...st.spec}):await rpc('live_create_v4',{...st.base,...st.pairs});room=d.room;token=d.host_token;
  try{sessionStorage.setItem('guest_'+room,`${BASE}?room=${room}&token=${d.guest_token}`)}catch{}
  history.replaceState({},'',`${BASE}?room=${room}&token=${token}`);await enter();
  }catch(e){msg(e.message);el('create').disabled=false}}
@@ -92,7 +96,7 @@ async function createSession(){try{
  el('createSession').disabled=true;
  const code=el('newcode').value.trim().toUpperCase();
  if(code&&!/^[A-Z0-9]{3,12}$/.test(code))throw Error('加入代碼請用 3–12 個英文字母或數字');
- const st=readSettings(),c={p_code:code||null};let d=st.pool?await rpc('live_session_create_pool2',{...st.base,...c,...st.pool}):await rpc('live_session_create_v4',{...st.base,...c,...st.pairs});
+ const st=readSettings(),c={p_code:code||null};let d=st.pool?await rpc('live_session_create_pool2',{...st.base,...c,...st.pool}):st.spec?await rpc('live_session_create_spec',{...st.base,...c,...st.spec}):await rpc('live_session_create_v4',{...st.base,...c,...st.pairs});
  history.replaceState({},'',`${BASE}?session=${d.session}&admin=${d.admin_token}`);await monitor(d.session,d.admin_token);
  }catch(e){msg(e.message==='Code in use'?'這個代碼正被另一個開放中的場次使用，請換一個。':e.message);el('createSession').disabled=false}}
 
@@ -227,12 +231,15 @@ function render(){
  if(game.round===0){el('notice').textContent='尚未產生第一回合';el('qtitle').textContent='等待開始';el('rules').textContent='';}
  else{const qd=questions[game.question]||['',''];el('qtitle').textContent=`Q${game.question}`;
  el('rules').textContent=`本回合有 ${game.seconds} 秒，每秒都計分。`+((game.mixed&&mixedRules[game.question])||qd[1]);
- const pool=game.pool||[],showOpp=!!game.told_same||pool.length>1;el('poolinfo').classList.toggle('hide',!showOpp);
- el('poollead').textContent=game.told_same?'和你的題目相同。':'是下列其中之一（以下規則是從對手的角度寫的：「你」指對手，「對手」指你）：';
+ // "對手本回合的題目" card: the opponent's candidate set (round design), the pool, or "same as yours"
+ const pool=game.pool||[],opts=game.opp_options||(pool.length>1?pool:[]),showOpp=!!game.told_same||opts.length>0;
+ el('poolinfo').classList.toggle('hide',!showOpp);
+ const pov='（以下規則是從對手的角度寫的：「你」指對手，「對手」指你）：';
+ el('poollead').textContent=game.told_same?'和你的題目相同。':(opts.length===1?'是'+pov:'是下列其中之一'+pov);
  if(game.told_same&&el('poollist').dataset.key){el('poollist').dataset.key='';el('poollist').replaceChildren();}
  const rbHome=showOpp?el('poolinfo'):el('qcard');if(el('readybox').parentNode!==rbHome)rbHome.append(el('readybox'));   // Ready comes after everything to read
- if(pool.length>1&&el('poollist').dataset.key!==pool.join(',')){el('poollist').dataset.key=pool.join(',');
-  el('poollist').replaceChildren(...pool.map(n=>{const li=document.createElement('li');li.textContent=`Q${n}：${mixedRules[n]||questions[n][1]}`;return li}));}
+ if(opts.length&&el('poollist').dataset.key!==opts.join(',')){el('poollist').dataset.key=opts.join(',');
+  el('poollist').replaceChildren(...opts.map(n=>{const li=document.createElement('li');li.textContent=`Q${n}：${mixedRules[n]||questions[n][1]}`;return li}));}
  const ns=game.notice_states||[],labels=ns.join('、');
  el('notice').textContent=(game.framing==='negative'&&ns.length===0)?'你沒有關於真實狀態的額外資訊。'
   :(game.framing==='negative'?'你知道真實狀態一定不在 ':'你知道真實狀態在 ')+labels+' 之中。';
