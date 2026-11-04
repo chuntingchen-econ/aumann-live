@@ -50,7 +50,10 @@ const questions={
 5:['Q5：自己選對得分','每一秒結束時，若你目前選擇真實狀態，你得 1 分。'],
 6:['Q6：自己選錯得分','每一秒結束時，若你目前選擇非真實狀態，你得 1 分。'],
 7:['Q7：對手選對得分','每一秒結束時，若對手目前選擇真實狀態，你得 1 分。'],
-8:['Q8：對手選錯得分','每一秒結束時，若對手目前選擇非真實狀態，你得 1 分。']
+8:['Q8：對手選錯得分','每一秒結束時，若對手目前選擇非真實狀態，你得 1 分。'],
+10:['Q10：得分取決於對手（不說細節）','你的得分取決於對手的選擇。'],
+11:['Q11：和對手同選得分','每一秒結束時，若你和對手目前選擇相同，你得 1 分。'],
+12:['Q12：和對手同選雙方得分','每一秒結束時，若你和對手目前選擇相同，你得 1 分，對手得 1 分。']
 };
 // experimenter's question-set picker (Q1–Q5 ticked by default, as before)
 el('qpick').replaceChildren(...Object.entries(questions).map(([n,q])=>{const l=document.createElement('label');const c=document.createElement('input');
@@ -60,14 +63,15 @@ el('qpick').addEventListener('change',()=>msg(''));el('qpairs').addEventListener
 const mixedRules={
 1:'每一秒結束時，若你和對手目前選擇相同，且都等於真實狀態，你得 1 分。',
 2:'每一秒結束時，若你和對手目前選擇不同，且兩個選擇都不等於真實狀態，你得 1 分。',
-3:'每一秒結束時，若你目前選擇真實狀態、已連續選對至少 2 秒，且你目前這段連續選對沒有被對手在 2 秒內追上（恰好 2 秒也算追上；或對手目前沒有選對），你得 1 分；否則得 0 分。'};
+3:'每一秒結束時，若你目前選擇真實狀態、已連續選對至少 2 秒，且你目前這段連續選對沒有被對手在 2 秒內追上（恰好 2 秒也算追上；或對手目前沒有選對），你得 1 分；否則得 0 分。',
+12:'每一秒結束時，若你和對手目前選擇相同，你得 1 分。'};
 const qdesc=x=>x.pool?`題目池 ${x.pool.map(n=>'Q'+n).join('、')}（${x.pool_same?'兩人同題':'每回合各自抽'}${x.pool_tell_same?'，告知同題':''}）`
  :x.spec?'題目 '+x.spec.map(([a,b])=>`Q${a.join('|')}/Q${b.join('|')}`).join('→')
    +((x.show_opp1||x.show_opp2)?`（告知${x.show_opp1&&x.show_opp2?' P1、P2':x.show_opp1?' P1':' P2'} 對手可能的題目）`:'')
  :'題目 '+(x.questions||[1,2,3,4,5]).map((n,i)=>x.questions2?`Q${n}/Q${x.questions2[i]}`:`Q${n}`).join('→');
 // "5/6, 5/7, 5/6|7" -> [[[5],[6]], [[5],[7]], [[5],[6,7]]]   (left = Player 1, right = Player 2, | = candidates)
 function parseSpec(txt){const toks=txt.trim().replace(/\s*([\/／|｜])\s*/g,'$1').replace(/／/g,'/').replace(/｜/g,'|').split(/[,，、;；\s]+/).filter(Boolean);
- const side=(x,t)=>{const a=x.split('|').map(Number);if(!x||a.some(n=>!Number.isInteger(n)||n<1||n>8)||new Set(a).size!==a.length)throw Error(`「${t}」看不懂：題號要是 1–8，候選題目用 | 分開、不要重複`);return a};
+ const side=(x,t)=>{const a=x.split('|').map(Number);if(!x||a.some(n=>!questions[n])||new Set(a).size!==a.length)throw Error(`「${t}」看不懂：題號要是 1–8 或 10–12，候選題目用 | 分開、不要重複`);return a};
  const spec=toks.map(t=>{const parts=t.split('/');if(parts.length>2)throw Error(`「${t}」看不懂，請寫成 5/6 或 5/6|7 這樣`);const a=side(parts[0],t);return [a,parts.length===2?side(parts[1],t):a.slice()];});
  if(!spec.length||spec.length>60)throw Error('請寫 1–60 個回合');return spec;}
 const pickedQuestions=()=>[...document.querySelectorAll('#qpick input:checked')].map(c=>Number(c.value)).sort((a,b)=>a-b);
