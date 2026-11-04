@@ -15,7 +15,7 @@
 <section class="card"><h2>控制</h2><div class="controls"><button id="closeSession">停止接受新的參與者</button><button class="danger" id="stopSession">停止所有組並關閉場次</button></div></section>
 </div>
 <div id="game" class="hide">
-<section id="waitcard" class="card hide"><h2>正在等待另一位參與者…</h2><p class="muted">請保持這個頁面開啟。配對成功後會自動進入第一回合。</p><p id="waitconn" class="muted"></p></section>
+<section id="expiredcard" class="card hide"><h2>已移出配對</h2><p>你已等待超過 30 分鐘，仍沒有配對到另一位參與者，系統已將你移出配對。</p><p class="muted">若要繼續參加，請回到首頁重新輸入代碼。</p><button id="expiredHome" class="main">回到首頁</button></section><section id="waitcard" class="card hide"><h2>正在等待另一位參與者…</h2><p class="muted">請保持這個頁面開啟。配對成功後會自動進入第一回合。</p><p id="waitconn" class="muted"></p></section>
 <div id="gamebody">
 <section id="endcard" class="card hide"><h2>實驗已結束</h2><p id="endtext" class="muted">所有紀錄都已保存在資料庫。</p><button id="home" class="main">返回首頁／建立新遊戲</button></section>
 <section class="card"><b id="seat"></b><p id="roundlabel" class="muted"></p><p id="stateset" class="lead"></p><div id="notice" class="big">—</div><p id="connection" class="muted"></p></section>
@@ -129,7 +129,7 @@ async function adminClose(sid,stopGames,btn){btn.disabled=true;
  }catch(e){msg(e.message);btn.disabled=false}}
 
 // ---------- experimenter monitor ----------
-const statusName={matching:'等待配對',waiting:'準備中',ready:'閱讀規則',playing:'進行中',stopped:'已停止',abandoned:'已離開'};
+const statusName={matching:'等待配對',waiting:'準備中',ready:'閱讀規則',playing:'進行中',stopped:'已停止',abandoned:'已離開',expired:'等待逾時'};
 async function monitor(sid,adm){
  el('setup').classList.add('hide');el('joinbox').classList.add('hide');el('monitor').classList.remove('hide');
  el('sessionurl').value=`${BASE}?session=${sid}`;
@@ -222,9 +222,12 @@ function buildChoices(){const key=(game.states||[]).join('');if(key===builtState
 function render(){
  if(!game)return;
  if(game.status==='abandoned'){void rejoin();return;}
+ const expired=game.status==='expired';           // waited more than 30 min without a partner
+ if(expired&&sessionId)store.del('seat_'+sessionId);
+ el('expiredcard').classList.toggle('hide',!expired);
  const waiting=game.status==='matching';
- el('waitcard').classList.toggle('hide',!waiting);el('gamebody').classList.toggle('hide',waiting);
- if(waiting)return;
+ el('waitcard').classList.toggle('hide',!waiting);el('gamebody').classList.toggle('hide',waiting||expired);
+ if(waiting||expired)return;
  el('seat').textContent='Player '+game.player;
  el('roundlabel').textContent=`Round ${game.round} / ${game.max_rounds}`;
  el('stateset').textContent=`真實狀態有 ${(game.states||[]).join('、')}。`;
@@ -294,6 +297,7 @@ el('prepare').onclick=()=>action('live_prepare_v2');
 el('start').onclick=()=>action('live_start_v2');
 el('stop').onclick=stopClick;
 el('home').onclick=goHome;
+el('expiredHome').onclick=goHome;
 el('copy').onclick=async()=>{try{await navigator.clipboard.writeText(el('guesturl').value);msg('已複製 Player 2 連結')}catch{msg('請長按網址手動複製')}};
 setInterval(updateTimer,50);
 setInterval(()=>{if(room&&token&&!document.hidden)void refresh()},4000);   // also the "I am online" heartbeat
