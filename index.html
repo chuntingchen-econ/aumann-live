@@ -86,7 +86,7 @@ document.querySelectorAll('input[name=poolsame]').forEach(r=>r.addEventListener(
 document.querySelectorAll('input[name=qmode]').forEach(r=>r.addEventListener('change',showMode));showMode();
 // Q13 / Q14 say what the OPPONENT gets; that must be true for every opponent question they can meet
 // experimenter's question bank on the setup page (built from the same texts the players see)
-const qnotes={10:'計分同 Q11：每秒兩人選擇相同 +1',12:'分數可能為負',13:'對手必須是 Q10、Q11、Q13 或 Q14',14:'對手必須是 Q12'};
+const qnotes={10:'得分完全由對手的題目決定：對手是 Q13 → 兩人選擇相同時 +1；對手是 Q14 → 相同時 −1。對手必須是 Q13 或 Q14',12:'分數可能為負',13:'對手必須是 Q10、Q11、Q13 或 Q14',14:'對手必須是 Q10 或 Q12'};
 const mixedNote='兩人可能不同題的場次，改用：';
 function buildBank(){const rows=Object.entries(questions).map(([n,q])=>{const tr=document.createElement('tr');
  const a=document.createElement('td');a.textContent='Q'+n;const b=document.createElement('td');const t=document.createElement('div');t.textContent=q[1];b.append(t);
@@ -94,9 +94,9 @@ function buildBank(){const rows=Object.entries(questions).map(([n,q])=>{const tr
  for(const x of notes){const d=document.createElement('div');d.className='qnote';d.textContent=x;b.append(d)}tr.append(a,b);return tr});
  const tb=document.createElement('table');tb.append(...rows);el('qbanklist').replaceChildren(tb);}
 buildBank();
-const oppClaim={13:{ok:[10,11,13,14],say:'對手得 1 分'},14:{ok:[12],say:'對手被扣 1 分'}};
+const oppClaim={13:{ok:[10,11,13,14],say:'寫「對手得 1 分」'},14:{ok:[10,12],say:'寫「對手被扣 1 分」'},10:{ok:[13,14],say:'的得分完全由對手的題目決定'}};
 function pairProblem(a,b){for(const [x,y] of [[a,b],[b,a]]){const c=oppClaim[x];
- if(c&&!c.ok.includes(y))return `Q${x} 寫「${c.say}」，對手必須是 ${c.ok.map(n=>'Q'+n).join('、')}，但對手可能是 Q${y}`;}return null}
+ if(c&&!c.ok.includes(y))return `Q${x} ${c.say}，對手必須是 ${c.ok.map(n=>'Q'+n).join('、')}，但對手可能是 Q${y}`;}return null}
 function readSettings(){
  let states=[...el('states').value.trim().toUpperCase()],rounds=Number(el('rounds').value),seconds=Number(el('seconds').value);
  if(states.length<2||states.length>6||new Set(states).size!==states.length||states.some(s=>!/^[A-Z]$/.test(s))||!Number.isInteger(rounds)||rounds<1||rounds>100||!Number.isInteger(seconds)||seconds<1||seconds>300)throw Error('請輸入 2–6 個不同字母、1–100 回合、1–300 秒');
@@ -114,7 +114,7 @@ async function createGame(){try{
  if(el('hideinfo').checked)await rpc('live_game_set_hide_info',{p_room:room,p_token:token,p_hide:true});
  try{sessionStorage.setItem('guest_'+room,`${BASE}?room=${room}&token=${d.guest_token}`)}catch{}
  history.replaceState({},'',`${BASE}?room=${room}&token=${token}`);await enter();
- }catch(e){msg(e.message==='Incompatible questions'?'題目組合不相容：Q13、Q14 寫到的對手得分必須成立。':e.message);el('create').disabled=false}}
+ }catch(e){msg(e.message==='Incompatible questions'?'題目組合不相容：Q10、Q13、Q14 的對手題目不符合。':e.message);el('create').disabled=false}}
 async function createSession(){try{
  el('createSession').disabled=true;
  const code=el('newcode').value.trim().toUpperCase();
@@ -122,7 +122,7 @@ async function createSession(){try{
  const st=readSettings(),c={p_code:code||null};let d=st.pool?await rpc('live_session_create_pool2',{...st.base,...c,...st.pool}):st.spec?await rpc('live_session_create_spec',{...st.base,...c,...st.spec}):await rpc('live_session_create_v4',{...st.base,...c,...st.pairs});
  if(el('hideinfo').checked)await rpc('live_session_set_hide_info',{p_session:d.session,p_admin:d.admin_token,p_hide:true});
  history.replaceState({},'',`${BASE}?session=${d.session}&admin=${d.admin_token}`);await monitor(d.session,d.admin_token);
- }catch(e){msg(e.message==='Code in use'?'這個代碼正被另一個開放中的場次使用，請換一個。':e.message==='Incompatible questions'?'題目組合不相容：Q13、Q14 寫到的對手得分必須成立。':e.message);el('createSession').disabled=false}}
+ }catch(e){msg(e.message==='Code in use'?'這個代碼正被另一個開放中的場次使用，請換一個。':e.message==='Incompatible questions'?'題目組合不相容：Q10、Q13、Q14 的對手題目不符合。':e.message);el('createSession').disabled=false}}
 
 // ---------- experimenter: list / close open sessions with the experimenter password ----------
 const adminErr={no_password:'尚未設定實驗者密碼，請先在 Supabase SQL Editor 設定。',wrong_password:'密碼錯誤。',locked:'密碼錯誤太多次，請 10 分鐘後再試。',not_found:'找不到這個場次。'};
