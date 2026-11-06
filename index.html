@@ -38,7 +38,7 @@ let sessionId=qs.get('session')||qs.get('s');const adminToken=qs.get('admin'),co
 let game=null,channel=null,clockOffset=0,loading=false,pending=false;
 let builtStates='';                 // choice buttons are built once per state set, never rebuilt
 let localPick=null;                 // shown at once, before the server confirms
-let inflight=0,advanceKey=null,rejoining=false;
+let inflight=0,advanceKey=null,rejoining=false,oppLive=null,reconcileT=null;
 function msg(s){el('message').textContent=s||''}
 async function rpc(fn,args){const {data,error}=await db.rpc(fn,args);if(error)throw Error(error.message);return data}
 const credentials=()=>({p_room:room,p_token:token});
@@ -305,30 +305,43 @@ function render(){
  const away=game.session&&game.opponent_seen_ago_ms!=null&&game.opponent_seen_ago_ms>15000&&game.status!=='stopped';
  el('connection').textContent=(away?'⚠ 對手可能已離線':'');
  buildChoices();
- let mine=game.my_choice??null,theirs=game.opponent_choice??null;
+ // what the server said at the time of the last view, unless a newer tap is known:
+ //  mine   - my own tap stays shown until a view fetched after all my taps were stored
+ //  theirs - the opponent's tap (sent straight over the realtime channel) stays shown until a view
+ //           fetched at least 1 s after it (by then his tap is stored; that view is the truth)
+ const fetched=game._fetchedAt||0;
  if(localPick&&localPick.round!==game.round)localPick=null;
- const shownMine=(localPick&&inflight>0)?localPick.choice:(mine??localPick?.choice??null);
+ if(oppLive&&oppLive.round!==game.round)oppLive=null;
+ const shownMine=(localPick&&(inflight>0||fetched<localPick.doneAt))?localPick.choice:(game.my_choice??null);
+ const theirs=(oppLive&&fetched<oppLive.at+1000)?oppLive.choice:(game.opponent_choice??null);
  document.querySelectorAll('.statebtn').forEach(b=>b.classList.toggle('picked',b.dataset.state===shownMine));
  document.querySelectorAll('.oppbtn').forEach(b=>b.classList.toggle('picked',b.dataset.state===theirs));
  updateTimer();
 }
 async function refresh(){if(!room||!token)return;if(loading){pending=true;return;}loading=true;
  try{let before=Date.now(),data=await rpc('live_view_v2',credentials()),after=Date.now();clockOffset=data.server_ms-(before+after)/2;
- game=data;render();msg('');}
+ data._fetchedAt=before;game=data;render();msg('');}
  catch(e){msg(e.message)}finally{loading=false;if(pending){pending=false;void refresh()}}}
 // Every tap is kept (no lock) and sent in tap order through a queue, so fast switches are all
 // recorded and the last tap is always the last one the server sees.
 let clickQueue=Promise.resolve();
+// The tap also goes straight to the opponent over the realtime channel (no database round trip), so his
+// screen updates at once; the stored taps (live_choose) stay the only record used for scoring.
 function choose(state){if(!game||remaining()<=0)return;
- localPick={choice:state,round:game.round};inflight++;render();
- clickQueue=clickQueue.then(()=>rpc('live_choose',{...credentials(),p_choice:state}))
-  .catch(e=>msg('這次點選沒有被記錄：'+e.message))
-  .finally(()=>{inflight--;void refresh()});}
+ localPick={choice:state,round:game.round,doneAt:Infinity};inflight++;render();
+ try{channel?.send({type:'broadcast',event:'pick',payload:{seat:game.player,round:game.round,choice:state}})}catch{}
+ clickQueue=clickQueue.then(()=>rpc('live_choose',{...credentials(),p_choice:state})).then(()=>null,e=>e)
+  .then(err=>{if(--inflight===0&&localPick)localPick.doneAt=Date.now();
+   if(err){msg('這次點選沒有被記錄：'+err.message);void refresh()}else render();});}
+// the opponent's tap, as he sent it; checked against the database by a view shortly after
+function onPick(p){if(!game||!p||p.seat===game.player||p.round!==game.round||!(game.states||[]).includes(p.choice))return;
+ oppLive={choice:p.choice,round:p.round,at:Date.now()};render();
+ clearTimeout(reconcileT);reconcileT=setTimeout(()=>void refresh(),1200);}
 async function action(fn){try{await rpc(fn,credentials());await refresh()}catch(e){msg(e.message)}}
 async function enter(){el('setup').classList.add('hide');el('joinbox').classList.add('hide');el('game').classList.remove('hide');await refresh();if(!game)return;
  if(game.player===1&&!game.session){el('host').classList.remove('hide');let link=null;try{link=sessionStorage.getItem('guest_'+room)}catch{}if(link){el('invite').classList.remove('hide');el('guesturl').value=link}}
- channel=db.channel('aumann:'+room,{config:{private:false}});
- channel.on('broadcast',{event:'changed'},()=>void refresh()).subscribe(status=>{el('waitconn').textContent='連線：'+status;if(status==='SUBSCRIBED')void refresh()});
+ channel=db.channel('aumann:'+room,{config:{private:false,broadcast:{self:false}}});
+ channel.on('broadcast',{event:'changed'},()=>void refresh()).on('broadcast',{event:'pick'},m=>onPick(m?.payload)).subscribe(status=>{el('waitconn').textContent='連線：'+status;if(status==='SUBSCRIBED')void refresh()});
 }
 // Stop needs two taps within 3 s (no browser pop-up).
 let stopArmed=null;
@@ -350,7 +363,8 @@ el('home').onclick=goHome;
 el('expiredHome').onclick=goHome;
 el('copy').onclick=async()=>{try{await navigator.clipboard.writeText(el('guesturl').value);msg('已複製 Player 2 連結')}catch{msg('請長按網址手動複製')}};
 setInterval(updateTimer,50);
-setInterval(()=>{if(room&&token&&!document.hidden)void refresh()},4000);   // also the "I am online" heartbeat
+setInterval(()=>{if(room&&token&&!document.hidden&&!(game?.status==='playing'&&remaining()>0))void refresh()},4000);   // also the "I am online" heartbeat
+setInterval(()=>{if(room&&token&&!document.hidden&&game?.status==='playing'&&remaining()>0)void refresh()},2000);   // during a round: re-check the shown choices more often
 setInterval(()=>{if(room&&token&&game?.status==='matching')void refresh()},1500);   // waiting room: notice a new partner quickly
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&room&&token)void refresh()});
 if(room&&token)void enter();
