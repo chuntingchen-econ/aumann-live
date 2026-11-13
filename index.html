@@ -12,6 +12,7 @@
 <p id="sessioninfo" class="muted"></p><div class="stats"><div><b id="nWaiting">0</b>等待配對</div><div><b id="nPlaying">0</b>進行中</div><div><b id="nDone">0</b>已完成</div></div>
 <p class="muted">這個頁面的網址含管理權限，請勿分享。</p></section>
 <section class="card"><h2>各組狀態</h2><table><thead><tr><th>組別</th><th>狀態</th><th>回合</th><th>P1／P2 上次連線</th></tr></thead><tbody id="gamesTable"></tbody></table></section>
+<section class="card"><h2>下載資料</h2><button id="exportBtn" class="main">下載本場資料（CSV）</button><p class="muted">下載兩個檔：每回合資料、點擊紀錄（和 SQL Editor 查詢 14、12 相同），可以直接給 aumann_video.py 做影片。實驗進行中也可以下載，拿到的是到目前為止的資料。要存進 Google 雲端硬碟，下載時選雲端硬碟裡的資料夾即可。</p><div id="exportLinks" class="muted"></div></section>
 <section class="card"><h2>控制</h2><div class="controls"><button id="closeSession">停止接受新的參與者</button><button class="danger" id="stopSession">停止所有組並關閉場次</button></div></section>
 </div>
 <div id="game" class="hide">
@@ -200,6 +201,19 @@ async function adminClose(sid,stopGames,btn){btn.disabled=true;
   await listSessions();msg(stopGames?'已停止所有組並關閉場次，代碼已釋出。':'已關閉場次，代碼已釋出。');
  }catch(e){msg(e.message);btn.disabled=false}}
 
+// ---------- experimenter: download a session's data as two CSV files (same columns as queries 14 and 12) ----------
+const csvCell=v=>{if(v===null||v===undefined)return '';const t=String(v);return /[",\n\r]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t};
+const toCsv=t=>'\ufeff'+[t.cols,...t.rows].map(r=>r.map(csvCell).join(',')).join('\r\n')+'\r\n';
+async function exportSession(sid,adm){const btn=el('exportBtn');btn.disabled=true;
+ try{const d=await rpc('live_session_export',{p_session:sid,p_admin:adm});
+  const base=`${d.code||sid.slice(0,8)}_${d.created_at}`;
+  const files=[[`${base}_rounds.csv`,toCsv(d.rounds),'每回合資料'],[`${base}_clicks.csv`,toCsv(d.clicks),'點擊紀錄']];
+  const links=files.map(([name,text,label])=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;a.textContent=`${label}（${name}）`;return a});
+  for(const a of links){a.click();await new Promise(r=>setTimeout(r,400));}
+  const p=document.createElement('p');p.textContent=`已下載：${d.rounds.rows.length} 筆回合、${d.clicks.rows.length} 筆點擊。如果只下載到一個檔，請按：`;
+  el('exportLinks').replaceChildren(p,links[0],document.createTextNode('　'),links[1]);
+ }catch(e){msg(e.message==='Access denied'?'沒有權限下載這個場次的資料。':e.message)}finally{btn.disabled=false}}
+
 // ---------- experimenter monitor ----------
 const statusName={matching:'等待配對',waiting:'準備中',ready:'閱讀規則',playing:'進行中',stopped:'已停止',abandoned:'已離開',expired:'等待逾時'};
 async function monitor(sid,adm){
@@ -215,6 +229,7 @@ async function monitor(sid,adm){
   el('gamesTable').replaceChildren(...rows);el('nWaiting').textContent=w;el('nPlaying').textContent=p;el('nDone').textContent=d;
   el('closeSession').disabled=v.status!=='open';msg('');
  }catch(e){msg(e.message)}}
+ el('exportBtn').onclick=()=>exportSession(sid,adm);
  el('closeSession').onclick=async()=>{try{await rpc('live_session_close',{p_session:sid,p_admin:adm,p_stop_games:false});await poll()}catch(e){msg(e.message)}};
  let armed=null;el('stopSession').onclick=async()=>{const b=el('stopSession');
   if(!armed){b.textContent='再按一次確認停止全部';b.classList.add('armed');armed=setTimeout(()=>{armed=null;b.textContent='停止所有組並關閉場次';b.classList.remove('armed')},3000);return;}
