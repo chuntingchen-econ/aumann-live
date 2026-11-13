@@ -69,10 +69,10 @@ const questions={
 36:['Q36：你選錯，對手得分','每一秒結束時，若你目前選擇非真實狀態，對手得 1 分。'],
 37:['Q37：你選對，對手扣分','每一秒結束時，若你目前選擇真實狀態，對手被扣 1 分。'],
 38:['Q38：你選錯，對手扣分','每一秒結束時，若你目前選擇非真實狀態，對手被扣 1 分。'],
-43:['Q43：不同選雙方得分','每一秒結束時，若你和對手目前選擇不同，你得 1 分，對手得 1 分。'],
-44:['Q44：不同選你得對手扣','每一秒結束時，若你和對手目前選擇不同，你得 1 分，對手被扣 1 分。'],
-45:['Q45：不同選你 0、對手得','每一秒結束時，若你和對手目前選擇不同，你得 0 分，對手得 1 分。'],
-46:['Q46：不同選你 0、對手扣','每一秒結束時，若你和對手目前選擇不同，你得 0 分，對手被扣 1 分。']
+43:['Q43：同選雙方得、不同選你得對手扣','每一秒結束時，若你和對手目前選擇相同，你得 1 分，對手得 1 分；若你和對手目前選擇不同，你得 1 分，對手被扣 1 分。'],
+44:['Q44：同選你得對手扣、不同選雙方得','每一秒結束時，若你和對手目前選擇相同，你得 1 分，對手被扣 1 分；若你和對手目前選擇不同，你得 1 分，對手得 1 分。'],
+45:['Q45：同選對手得、不同選對手扣','每一秒結束時，若你和對手目前選擇相同，你得 0 分，對手得 1 分；若你和對手目前選擇不同，你得 0 分，對手被扣 1 分。'],
+46:['Q46：同選對手扣、不同選對手得','每一秒結束時，若你和對手目前選擇相同，你得 0 分，對手被扣 1 分；若你和對手目前選擇不同，你得 0 分，對手得 1 分。']
 };
 // experimenter's question-set picker (Q1–Q5 ticked by default, as before)
 el('qpick').replaceChildren(...Object.entries(questions).map(([n,q])=>{const l=document.createElement('label');const c=document.createElement('input');
@@ -107,12 +107,12 @@ document.querySelectorAll('input[name=qmode]').forEach(r=>r.addEventListener('ch
 // when you and your opponent are on the same state: what YOU get (ownSame) and what the question SAYS the OPPONENT gets (oppSame);
 // Q20/Q21 say nothing about the opponent; Q10 takes what the opponent's question says about him
 const isQ35=n=>n>=35&&n<=38;   // Q35–Q38: own score from the opponent's words; both players must have one
-const ownSame={11:1,12:-1,13:1,14:1,15:0,16:0,17:1,18:1,20:1,21:0,22:0,23:0,43:0,44:0,45:0,46:0},oppSame={11:0,12:0,13:1,14:-1,15:1,16:-1,17:20,18:-20};
+const ownSame={11:1,12:-1,13:1,14:1,15:0,16:0,17:1,18:1,20:1,21:0,22:0,23:0,43:1,44:1,45:0,46:0},oppSame={11:0,12:0,13:1,14:-1,15:1,16:-1,17:20,18:-20,43:1,44:-1,45:1,46:-1};
 // the same, for "both have chosen and the choices differ"
-const ownDiff={11:0,12:0,13:0,14:0,15:0,16:0,17:0,18:0,20:0,21:1,22:1,23:-1,43:1,44:1,45:0,46:0},oppDiff={22:1,23:-1,43:1,44:-1,45:1,46:-1};
+const ownDiff={11:0,12:0,13:0,14:0,15:0,16:0,17:0,18:0,20:0,21:1,22:1,23:-1,43:1,44:1,45:0,46:0},oppDiff={22:1,23:-1,43:-1,44:1,45:-1,46:1};
 const saysOpp=v=>v<0?`對手被扣 ${-v} 分`:`對手得 ${v} 分`;
 const partners=x=>Object.keys(questions).map(Number).filter(y=>!pairProblem(x,y));
-const qnotes={10:'得分完全由對手的題目決定。兩人選擇相同時：對手 Q11、Q12 → 0；Q13、Q15 → +1；Q14、Q16 → −1；Q17 → +20；Q18 → −20。兩人選擇不同時（兩人都要有選擇）：對手 Q22、Q43、Q45 → +1；Q23、Q44、Q46 → −1',43:'兩人都要有選擇才算「不同」',44:'兩人都要有選擇才算「不同」',45:'兩人都要有選擇才算「不同」',46:'兩人都要有選擇才算「不同」',12:'分數可能為負',21:'兩人都要有選擇才算「不同」',22:'兩人都要有選擇才算「不同」',23:'分數可能為負。兩人都要有選擇才算「不同」'};
+const qnotes={10:'得分完全由對手的題目決定。兩人選擇相同時：對手 Q11、Q12 → 0；Q13、Q15 → +1；Q14、Q16 → −1；Q17 → +20；Q18 → −20；Q43、Q45 → +1；Q44、Q46 → −1。兩人選擇不同時（兩人都要有選擇）：對手 Q22、Q44、Q46 → +1；Q23、Q43、Q45 → −1',43:'兩人都要有選擇才算「不同」',44:'兩人都要有選擇才算「不同」',45:'兩人都要有選擇才算「不同」',46:'兩人都要有選擇才算「不同」',12:'分數可能為負',21:'兩人都要有選擇才算「不同」',22:'兩人都要有選擇才算「不同」',23:'分數可能為負。兩人都要有選擇才算「不同」'};
 const q35note='自己的得分由對手的題目決定：對手 Q35 → 對手選真實狀態時你 +1；Q36 → 對手選非真實狀態時 +1；Q37 → 對手選真實狀態時 −1；Q38 → 對手選非真實狀態時 −1';
 for(const n of [35,36,37,38])qnotes[n]=q35note;
 for(const n of [10,11,12,13,14,15,16,17,18,20,21,22,23,35,36,37,38,43,44,45,46])qnotes[n]=(qnotes[n]?qnotes[n]+'。':'')+'對手必須是 '+partners(n).map(y=>'Q'+y).join('、');
@@ -127,7 +127,7 @@ buildBank();
 function pairProblem(a,b){if(isQ35(a)!==isQ35(b)){const x=isQ35(a)?a:b,y=isQ35(a)?b:a;return `Q${x} 的得分要由對手的題目決定，對手必須是 Q35–Q38，但對手可能是 Q${y}`;}
  for(const [x,y] of [[a,b],[b,a]]){
  if(x===10&&oppSame[y]===undefined&&oppDiff[y]===undefined)return `Q10 的得分完全由對手的題目決定，對手必須是 Q11–Q18、Q22、Q23 或 Q43–Q46，但對手可能是 Q${y}`;
- const c=oppSame[x];if(c!==undefined&&y!==10&&ownSame[y]!==c)return `Q${x} 寫「${saysOpp(c)}」，但對手可能是 Q${y}，而 Q${y} ${ownSame[y]!==undefined?'在兩人選擇相同時'+saysOpp(ownSame[y]).slice(2):'的得分不是只看兩人是否相同'}`;
+ const c=oppSame[x];if(c!==undefined&&y!==10&&ownSame[y]!==c)return `Q${x} 寫「${oppDiff[x]!==undefined?'兩人選擇相同時':''}${saysOpp(c)}」，但對手可能是 Q${y}，而 Q${y} ${ownSame[y]!==undefined?'在兩人選擇相同時'+saysOpp(ownSame[y]).slice(2):'的得分不是只看兩人是否相同'}`;
  const cd=oppDiff[x];if(cd!==undefined&&y!==10&&ownDiff[y]!==cd)return `Q${x} 寫「兩人選擇不同時${saysOpp(cd)}」，但對手可能是 Q${y}，而 Q${y} ${ownDiff[y]!==undefined?'在兩人選擇不同時'+saysOpp(ownDiff[y]).slice(2):'的得分不是只看兩人是否相同'}`;}return null}
 function readSettings(){
  let states=[...el('states').value.trim().toUpperCase()],rounds=Number(el('rounds').value),seconds=Number(el('seconds').value);
