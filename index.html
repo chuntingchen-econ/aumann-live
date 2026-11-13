@@ -410,7 +410,11 @@ function render(){
  document.querySelectorAll('.statebtn').forEach(b=>b.classList.toggle('picked',b.dataset.state===shownMine));
  document.querySelectorAll('.oppbtn').forEach(b=>b.classList.toggle('picked',b.dataset.state===theirs));
  updateTimer();
+ // v36: the computer's opening pick comes 0.3–1 s after the start; look again just after that, so it shows at once
+ if(game.status==='playing'&&game.started_ms&&openKey!==room+':'+game.round){openKey=room+':'+game.round;
+  setTimeout(()=>void refresh(),Math.max(0,game.started_ms+1050-(Date.now()+clockOffset)));}
 }
+let openKey=null;
 async function refresh(){if(!room||!token)return;if(loading){pending=true;return;}loading=true;
  try{let before=Date.now(),data=await rpc('live_view_v2',credentials()),after=Date.now();clockOffset=data.server_ms-(before+after)/2;
  data._fetchedAt=before;game=data;render();msg('');}
