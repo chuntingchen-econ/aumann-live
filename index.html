@@ -3,8 +3,8 @@
 </style></head><body>
 <h1>🎲 Pair Live</h1>
 <div id="joinbox" class="card"><h2>參加實驗</h2><label for="joincode">請輸入實驗者給你的代碼</label><input id="joincode" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="例如 4821"><div class="controls" style="margin-top:12px"><button id="joinBtn" class="main">加入</button></div></div>
-<div id="setup" class="card hide"><h2>實驗者：建立實驗</h2><label for="states">狀態集合 S</label><input id="states" value="ABC" maxlength="6"><label for="seconds">每回合秒數</label><input id="seconds" type="number" value="30" min="1" max="300"><details id="qbank" class="qbank"><summary>題目庫（點開查看所有題目）</summary><div id="qbanklist"></div></details><input type="radio" name="qmode" value="pairs" checked hidden><div id="qpickbox" class="hide"><label id="qpicklabel">題目（勾選要用的題目）</label><div id="qpick" class="qpick"></div><p id="qpicknote" class="muted"></p></div><div id="poolopts" class="hide"><label>題目池：兩人的題目</label><div class="modes"><label><input type="radio" name="poolsame" value="diff" checked>各自抽（兩人可能不同題）</label><label><input type="radio" name="poolsame" value="same">抽一題兩人共用（兩人一定同題）</label><label><input type="checkbox" id="tellsame" disabled>告訴受試者「對手的題目和你相同」（只能搭配「兩人共用」；不勾的話，受試者看到的畫面和「各自抽」完全一樣）</label></div></div><div id="pairsbox"><label for="savedsets">已存的題組</label><select id="savedsets"><option value="">（選一個題組，自動填入下面）</option></select><label for="qpairs">題組（每一組是一個回合的題目：Player 1／Player 2）</label><input id="qpairs" autocomplete="off" placeholder="例如 5/6, 5/7, 5/6|7, 20/21x"><p class="muted">每一組代表一個回合的設定。每一對受試者會把題組<b>隨機排序</b>後依序玩，每一對的順序各自抽。斜線左邊是 Player 1、右邊是 Player 2；寫 5 或 5/5 代表兩人同題。用 | 列出候選題目，該回合從中等機率抽一題，例如 5/6|7 是 Player 1 做 Q5、Player 2 從 Q6、Q7 抽一題。在一組後面加 x（例如 20/21x 或 20/21 x），這個回合兩人都看不到真實狀態和私有資訊。</p><label for="rounds">總回合數</label><input id="rounds" type="number" value="4" min="1" max="100"><p id="roundnote" class="muted"></p><div class="modes"><label><input type="checkbox" id="showopp1" checked>告訴 Player 1：對手（Player 2）本回合可能的題目</label><label><input type="checkbox" id="showopp2" checked>告訴 Player 2：對手（Player 1）本回合可能的題目</label></div><p class="muted">勾了之後，受試者會看到「對手本回合的題目」卡片：對手只有一個候選時，他就知道對手的題目；有多個候選時，看到「是下列其中之一」。不勾的話，受試者只看到自己的題目。</p></div><p class="muted">每回合重新抽取真實狀態和兩人的資訊。</p><div class="modes"><label><input type="checkbox" id="hideinfo">整場都不顯示真實狀態和私有資訊（給 Q10–Q18、Q20–Q23、Q43–Q46 這類與真實狀態無關的題目用；受試者只看到 A、B、C… 按鈕和題目）。只有部分回合不顯示時，改在題組裡那一組後面加 x</label></div>
-<label>對手</label><div class="modes"><label><input type="radio" name="botmode" value="" checked>另一位參與者（依到達順序兩兩配對）</label><label><input type="radio" name="botmode" value="mirror">電腦：鏡像（參與者選什麼，電腦就選一樣的）</label><label><input type="radio" name="botmode" value="anti">電腦：反鏡像（電腦隨機選一個和參與者不同的狀態）</label></div><p class="muted">選電腦時，每位參與者一進來就和電腦配對（參與者是 Player 1、電腦是 Player 2），不用等人。電腦一直是 Ready，參與者還沒選之前電腦不選；參與者每點一次，電腦在 0.3–1 秒後跟著選。參與者畫面和真人對手時一樣，不會顯示對手是電腦。只能用在自動配對場次。</p>
+<div id="setup" class="card hide"><h2>實驗者：建立實驗</h2><label for="states">狀態集合 S</label><input id="states" value="ABC" maxlength="6"><label for="seconds">每回合秒數</label><input id="seconds" type="number" value="30" min="1" max="300"><details id="qbank" class="qbank"><summary>題目庫（點開查看所有題目）</summary><div id="qbanklist"></div></details><input type="radio" name="qmode" value="pairs" checked hidden><div id="qpickbox" class="hide"><label id="qpicklabel">題目（勾選要用的題目）</label><div id="qpick" class="qpick"></div><p id="qpicknote" class="muted"></p></div><div id="poolopts" class="hide"><label>題目池：兩人的題目</label><div class="modes"><label><input type="radio" name="poolsame" value="diff" checked>各自抽（兩人可能不同題）</label><label><input type="radio" name="poolsame" value="same">抽一題兩人共用（兩人一定同題）</label><label><input type="checkbox" id="tellsame" disabled>告訴受試者「對手的題目和你相同」（只能搭配「兩人共用」；不勾的話，受試者看到的畫面和「各自抽」完全一樣）</label></div></div><div id="pairsbox"><label for="savedsets">已存的題組</label><select id="savedsets"><option value="">（選一個題組，自動填入下面）</option></select><label for="qpairs">題組（每一組是一個回合的題目：Player 1／Player 2）</label><input id="qpairs" autocomplete="off" placeholder="例如 5/6, 5/7, 5/6|7, 20/21x"><p class="muted">每一組代表一個回合的設定。每一對受試者會把題組<b>隨機排序</b>後依序玩，每一對的順序各自抽。斜線左邊是 Player 1、右邊是 Player 2；寫 5 或 5/5 代表兩人同題。用 | 列出候選題目，該回合從中等機率抽一題，例如 5/6|7 是 Player 1 做 Q5、Player 2 從 Q6、Q7 抽一題。在一組後面加 x（例如 20/21x 或 20/21 x），這個回合兩人都看不到真實狀態和私有資訊。加 m 或 a，這個回合的對手是電腦：m＝鏡像、a＝反鏡像（例如 10/15xm, 10/15xa）；題組裡只要有一組標了 m／a，整場都是和電腦配對。</p><label for="rounds">總回合數</label><input id="rounds" type="number" value="4" min="1" max="100"><p id="roundnote" class="muted"></p><div class="modes"><label><input type="checkbox" id="showopp1" checked>告訴 Player 1：對手（Player 2）本回合可能的題目</label><label><input type="checkbox" id="showopp2" checked>告訴 Player 2：對手（Player 1）本回合可能的題目</label></div><p class="muted">勾了之後，受試者會看到「對手本回合的題目」卡片：對手只有一個候選時，他就知道對手的題目；有多個候選時，看到「是下列其中之一」。不勾的話，受試者只看到自己的題目。</p></div><p class="muted">每回合重新抽取真實狀態和兩人的資訊。</p><div class="modes"><label><input type="checkbox" id="hideinfo">整場都不顯示真實狀態和私有資訊（給 Q10–Q18、Q20–Q23、Q43–Q46 這類與真實狀態無關的題目用；受試者只看到 A、B、C… 按鈕和題目）。只有部分回合不顯示時，改在題組裡那一組後面加 x</label></div>
+<label>對手</label><div class="modes"><label><input type="radio" name="botmode" value="" checked>另一位參與者（依到達順序兩兩配對）</label><label><input type="radio" name="botmode" value="mirror">電腦：鏡像（參與者選什麼，電腦就選一樣的）</label><label><input type="radio" name="botmode" value="anti">電腦：反鏡像（電腦隨機選一個和參與者不同的狀態）</label></div><p class="muted">選電腦時，每位參與者一進來就和電腦配對（參與者是 Player 1、電腦是 Player 2），不用等人。電腦一直是 Ready，參與者還沒選之前電腦不選；參與者每點一次，電腦在 0.3–1 秒後跟著選。參與者畫面和真人對手時一樣，不會顯示對手是電腦。只能用在自動配對場次。題組裡標了 m／a 的組照標示；沒標示的組照這裡的選擇。</p>
 <label for="newcode">加入代碼（3–12 個英文或數字；留空會自動產生 4 位數）</label><input id="newcode" autocomplete="off" maxlength="12" placeholder="留空自動產生">
 <div class="controls" style="margin-top:12px"><button id="createSession" class="main">建立自動配對場次</button><button id="create">建立單一雙人遊戲（手動）</button></div>
 <p class="muted">自動配對：把加入代碼告訴所有參與者，輸入代碼的人依到達順序兩兩配對，配對後雙方按 Ready 就自動開始。</p><h2 style="margin-top:26px">管理開放中的場次</h2><label for="adminpw">實驗者密碼</label><input id="adminpw" type="password" autocomplete="current-password"><div class="controls" style="margin-top:12px"><button id="listSessions">顯示開放中的場次</button><button id="listClosed">顯示已關閉的場次</button></div><div id="sessionlist"></div><div id="closedlist"></div><p class="muted">「關閉場次」：不再接受新的參與者，並釋出加入代碼；進行中的組可以玩完。「全部停止」：連進行中的組也一起停止。「顯示已關閉的場次」：列出最近關閉的場次（新的在前），可以開監看頁或直接下載資料（CSV）。</p></div>
@@ -102,16 +102,20 @@ const mixedRules={
 2:'每一秒結束時，若你和對手目前選擇不同，且兩個選擇都不等於真實狀態，你得 1 分。',
 3:'每一秒結束時，若你目前選擇真實狀態、已連續選對至少 2 秒，且你目前這段連續選對沒有被對手在 2 秒內追上（恰好 2 秒也算追上；或對手目前沒有選對），你得 1 分；否則得 0 分。'};
 const botName={mirror:'電腦（鏡像）',anti:'電腦（反鏡像）'};
-const qdesc=x=>(x.bot?`對手：${botName[x.bot]||x.bot} · `:'')+qdesc0(x);
+const specBots=x=>(x.spec||[]).some(e=>e[3]);
+const qdesc=x=>(x.bot?(specBots(x)?'對手：電腦（依題組'+((x.spec||[]).every(e=>e[3])?'':'；未標示的組＝'+(x.bot==='mirror'?'鏡像':'反鏡像'))+'） · ':`對手：${botName[x.bot]||x.bot} · `):'')+qdesc0(x);
 const qdesc0=x=>x.pool?`題目池 ${x.pool.map(n=>'Q'+n).join('、')}（${x.pool_same?'兩人同題':'每回合各自抽'}${x.pool_tell_same?'，告知同題':''}）`
- :x.spec?(x.shuffle?'題組（每對隨機排序）':'題目 ')+x.spec.map(([a,b,h])=>`Q${a.join('|')}/Q${b.join('|')}${h?'（無狀態）':''}`).join(x.shuffle?'、':'→')
+ :x.spec?(x.shuffle?'題組（每對隨機排序）':'題目 ')+x.spec.map(([a,b,h,bt])=>`Q${a.join('|')}/Q${b.join('|')}${h?'（無狀態）':''}${bt&&x.bot?`（${bt==='mirror'?'鏡像':'反鏡像'}）`:''}`).join(x.shuffle?'、':'→')
    +((x.show_opp1||x.show_opp2)?`（告知${x.show_opp1&&x.show_opp2?' P1、P2':x.show_opp1?' P1':' P2'} 對手可能的題目）`:'')
  :'題目 '+(x.questions||[1,2,3,4,5]).map((n,i)=>x.questions2?`Q${n}/Q${x.questions2[i]}`:`Q${n}`).join('→');
 // "5/6, 5/7, 5/6|7, 20/21x" -> [[[5],[6]], [[5],[7]], [[5],[6,7]], [[20],[21],true]]
 //   (left = Player 1, right = Player 2, | = candidates, x at the end = no state information in that round)
-function parseSpec(txt){const toks=txt.trim().replace(/\s*([\/／|｜])\s*/g,'$1').replace(/／/g,'/').replace(/｜/g,'|').replace(/\s+([xXｘＸ])(?=$|[,，、;；\s])/g,'$1').split(/[,，、;；\s]+/).filter(Boolean);
+function parseSpec(txt){const toks=txt.trim().replace(/\s*([\/／|｜])\s*/g,'$1').replace(/／/g,'/').replace(/｜/g,'|').replace(/\s+([xXｘＸmMｍＭaAａＡ]+)(?=$|[,，、;；\s])/g,'$1').split(/[,，、;；\s]+/).filter(Boolean);
  const side=(x,t)=>{const a=x.split('|').map(Number);if(!x||a.some(n=>!questions[n])||new Set(a).size!==a.length)throw Error(`「${t}」看不懂：題號要是 1–8、10–18、20–23、35–38 或 43–46，候選題目用 | 分開、不要重複；不顯示狀態的回合在後面加 x`);return a};
- const spec=toks.map(t0=>{const hide=/[xXｘＸ]$/.test(t0),t=hide?t0.slice(0,-1):t0;const parts=t.split('/');if(parts.length>2)throw Error(`「${t0}」看不懂，請寫成 5/6、5/6|7 或 20/21x 這樣`);const a=side(parts[0],t0);const e=[a,parts.length===2?side(parts[1],t0):a.slice()];if(hide)e.push(true);return e;});
+ const spec=toks.map(t0=>{const fl=(t0.match(/[xXｘＸmMｍＭaAａＡ]+$/)||[''])[0],t=t0.slice(0,t0.length-fl.length);
+  const hide=/[xXｘＸ]/.test(fl),bm=/[mMｍＭ]/.test(fl),ba=/[aAａＡ]/.test(fl);if(bm&&ba)throw Error(`「${t0}」同時寫了 m 和 a：一組只能是鏡像（m）或反鏡像（a）其中一種`);
+  const parts=t.split('/');if(parts.length>2)throw Error(`「${t0}」看不懂，請寫成 5/6、5/6|7、20/21x 或 10/15xa 這樣`);const a=side(parts[0],t0);const e=[a,parts.length===2?side(parts[1],t0):a.slice()];
+  if(hide||bm||ba)e.push(hide);if(bm||ba)e.push(bm?'mirror':'anti');return e;});
  if(!spec.length||spec.length>60)throw Error('請寫 1–60 個回合');return spec;}
 const pickedQuestions=()=>[...document.querySelectorAll('#qpick input:checked')].map(c=>Number(c.value)).sort((a,b)=>a-b);
 const qmode=()=>document.querySelector('input[name=qmode]:checked').value;
@@ -161,8 +165,13 @@ function readSettings(){
  for(const a of q)for(const b of (both?[a]:q)){const p=pairProblem(a,b);if(p)throw Error((m==='pool'?'題目池不成立：':'兩人同題時不成立：')+p+'。')}
  return m==='pool'?{base,pool:{p_pool:q,p_same:poolSame(),p_tell_same:poolSame()&&el('tellsame').checked}}:{base,pairs:{p_q1:q,p_q2:q}};}
 const botMode=()=>document.querySelector('input[name=botmode]:checked')?.value||'';
+// v35: groups marked m / a play against the computer; then the whole session does (one cannot switch between a person and
+// the computer within a game). Unmarked groups use the 「對手」 choice, which must then be a computer.
+function sessionBot(st){const sp=st.spec?.p_spec||[],marks=sp.map(e=>e[3]).filter(Boolean);if(!marks.length)return botMode();
+ if(sp.some(e=>!e[3])&&!botMode())throw Error('題組裡有些組標了 m／a（對手是電腦），有些沒有：參與者在同一場裡不能一下對真人、一下對電腦。請每一組都標 m 或 a，或在「對手」選電腦（鏡像或反鏡像），當作沒標示的組的預設。');
+ return botMode()||marks[0];}
 async function createGame(){try{
- if(botMode())throw Error('電腦對手只能用在自動配對場次，請按「建立自動配對場次」。');
+ if(botMode()||(el('qpairs').value.match(/[mMｍＭaAａＡ]\s*(?=$|[,，、;；])/)))throw Error('電腦對手只能用在自動配對場次，請按「建立自動配對場次」。');
  el('create').disabled=true;
  const st=readSettings();let d=st.pool?await rpc('live_create_pool2',{...st.base,...st.pool}):st.spec?await rpc('live_create_spec2',{...st.base,...st.spec}):await rpc('live_create_v4',{...st.base,...st.pairs});room=d.room;token=d.host_token;
  if(el('hideinfo').checked)await rpc('live_game_set_hide_info',{p_room:room,p_token:token,p_hide:true});
@@ -173,9 +182,9 @@ async function createSession(){try{
  el('createSession').disabled=true;
  const code=el('newcode').value.trim().toUpperCase();
  if(code&&!/^[A-Z0-9]{3,12}$/.test(code))throw Error('加入代碼請用 3–12 個英文字母或數字');
- const st=readSettings(),c={p_code:code||null};let d=st.pool?await rpc('live_session_create_pool2',{...st.base,...c,...st.pool}):st.spec?await rpc('live_session_create_spec2',{...st.base,...c,...st.spec}):await rpc('live_session_create_v4',{...st.base,...c,...st.pairs});
+ const st=readSettings(),c={p_code:code||null};sessionBot(st);let d=st.pool?await rpc('live_session_create_pool2',{...st.base,...c,...st.pool}):st.spec?await rpc('live_session_create_spec2',{...st.base,...c,...st.spec}):await rpc('live_session_create_v4',{...st.base,...c,...st.pairs});
  if(el('hideinfo').checked)await rpc('live_session_set_hide_info',{p_session:d.session,p_admin:d.admin_token,p_hide:true});
- const bm=botMode();if(bm)await rpc('live_session_set_bot',{p_session:d.session,p_admin:d.admin_token,p_bot:bm});
+ const bm=sessionBot(st);if(bm)await rpc('live_session_set_bot',{p_session:d.session,p_admin:d.admin_token,p_bot:bm});
  history.replaceState({},'',`${BASE}?session=${d.session}&admin=${d.admin_token}`);await monitor(d.session,d.admin_token);
  }catch(e){msg(e.message==='Code in use'?'這個代碼正被另一個開放中的場次使用，請換一個。':e.message==='Incompatible questions'?'題目組合不相容：有題目寫到的對手得分，和對手的題目不符。':e.message);el('createSession').disabled=false}}
 
