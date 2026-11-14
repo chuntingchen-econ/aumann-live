@@ -74,7 +74,8 @@ const questions={
 43:['Q43：同選雙方得、不同選你得對手扣','每一秒結束時，若你和對手目前選擇相同，你得 1 分，對手得 1 分；若你和對手目前選擇不同，你得 1 分，對手被扣 1 分。'],
 44:['Q44：同選你得對手扣、不同選雙方得','每一秒結束時，若你和對手目前選擇相同，你得 1 分，對手被扣 1 分；若你和對手目前選擇不同，你得 1 分，對手得 1 分。'],
 45:['Q45：同選對手得、不同選對手扣','每一秒結束時，若你和對手目前選擇相同，你得 0 分，對手得 1 分；若你和對手目前選擇不同，你得 0 分，對手被扣 1 分。'],
-46:['Q46：同選對手扣、不同選對手得','每一秒結束時，若你和對手目前選擇相同，你得 0 分，對手被扣 1 分；若你和對手目前選擇不同，你得 0 分，對手得 1 分。']
+46:['Q46：同選對手扣、不同選對手得','每一秒結束時，若你和對手目前選擇相同，你得 0 分，對手被扣 1 分；若你和對手目前選擇不同，你得 0 分，對手得 1 分。'],
+50:['Q50：選對手以為可能的錯誤狀態','每一秒結束時，若你目前選擇的狀態不是真實狀態，而且對手認為它可能是真實狀態，你得 1 分。']
 };
 // experimenter's question-set picker (Q1–Q5 ticked by default, as before)
 el('qpick').replaceChildren(...Object.entries(questions).map(([n,q])=>{const l=document.createElement('label');const c=document.createElement('input');
@@ -91,7 +92,7 @@ el('qpairs').addEventListener('input',()=>{msg('');roundNote();if(el('savedsets'
 // saved question sets (same as question_bank.md); picking one fills the box and resets the round count to its size
 const savedSets=[
  ['題組 1','5/5, 6/6, 7/7, 8/8, 5/20, 6/20, 20/5, 20/6, 5|6/20, 20/5|6, 20|21/20x, 20/20|21x, 10/15|16x, 15|16/10x, 10/13|18x, 13|18/10x'],
- ['題組 2','1/1, 2/2, 3/3'],
+ ['題組 2','1/1, 2/2, 3/3, 50/5|6, 5|6/50'],
  ['題組 3','10/15|16x, 15|16/10x, 10/13|14x, 13|14/10x, 10/45|46x, 45|46/10x, 10/43|44x, 43|44/10x']];
 el('savedsets').append(...savedSets.map(([name,t])=>{const o=document.createElement('option');o.value=t;o.textContent=`${name}（${parseSpec(t).length} 組）：${t}`;return o}));
 el('savedsets').addEventListener('change',()=>{const t=el('savedsets').value;if(!t)return;el('qpairs').value=t;roundsTouched=false;msg('');roundNote();});
@@ -112,7 +113,7 @@ const qdesc0=x=>x.pool?`題目池 ${x.pool.map(n=>'Q'+n).join('、')}（${x.pool
 // "5/6, 5/7, 5/6|7, 20/21x" -> [[[5],[6]], [[5],[7]], [[5],[6,7]], [[20],[21],true]]
 //   (left = Player 1, right = Player 2, | = candidates, x at the end = no state information in that round)
 function parseSpec(txt){const toks=txt.trim().replace(/\s*([\/／|｜])\s*/g,'$1').replace(/／/g,'/').replace(/｜/g,'|').replace(/\s+([xXｘＸmMｍＭaAａＡrRｒＲ]+)(?=$|[,，、;；\s])/g,'$1').split(/[,，、;；\s]+/).filter(Boolean);
- const side=(x,t)=>{const a=x.split('|').map(Number);if(!x||a.some(n=>!questions[n])||new Set(a).size!==a.length)throw Error(`「${t}」看不懂：題號要是 1–8、10–18、20–23、35–38 或 43–46，候選題目用 | 分開、不要重複；不顯示狀態的回合在後面加 x`);return a};
+ const side=(x,t)=>{const a=x.split('|').map(Number);if(!x||a.some(n=>!questions[n])||new Set(a).size!==a.length)throw Error(`「${t}」看不懂：題號要是 1–8、10–18、20–23、35–38、43–46 或 50，候選題目用 | 分開、不要重複；不顯示狀態的回合在後面加 x`);return a};
  const spec=toks.map(t0=>{const fl=(t0.match(/[xXｘＸmMｍＭaAａＡrRｒＲ]+$/)||[''])[0],t=t0.slice(0,t0.length-fl.length);
   const hide=/[xXｘＸ]/.test(fl),bm=/[mMｍＭ]/.test(fl),ba=/[aAａＡ]/.test(fl),br=/[rRｒＲ]/.test(fl);if(bm+ba+br>1)throw Error(`「${t0}」寫了不只一種電腦：一組只能是鏡像（m）、反鏡像（a）或隨機（r）其中一種`);
   const parts=t.split('/');if(parts.length>2)throw Error(`「${t0}」看不懂，請寫成 5/6、5/6|7、20/21x、10/15xa 或 10/15xr 這樣`);const a=side(parts[0],t0);const e=[a,parts.length===2?side(parts[1],t0):a.slice()];
@@ -138,6 +139,7 @@ const ownDiff={11:0,12:0,13:0,14:0,15:0,16:0,17:0,18:0,20:0,21:1,22:1,23:-1,43:1
 const saysOpp=v=>v<0?`對手被扣 ${-v} 分`:`對手得 ${v} 分`;
 const partners=x=>Object.keys(questions).map(Number).filter(y=>!pairProblem(x,y));
 const qnotes={10:'得分完全由對手的題目決定。兩人選擇相同時：對手 Q11、Q12 → 0；Q13、Q15 → +1；Q14、Q16 → −1；Q17 → +20；Q18 → −20；Q43、Q45 → +1；Q44、Q46 → −1。兩人選擇不同時（兩人都要有選擇）：對手 Q22、Q44、Q46 → +1；Q23、Q43、Q45 → −1',43:'兩人都要有選擇才算「不同」',44:'兩人都要有選擇才算「不同」',45:'兩人都要有選擇才算「不同」',46:'兩人都要有選擇才算「不同」',12:'分數可能為負',21:'兩人都要有選擇才算「不同」',22:'兩人都要有選擇才算「不同」',23:'分數可能為負。兩人都要有選擇才算「不同」'};
+qnotes[50]='「對手認為它可能是真實狀態」＝這個狀態在對手得到的資訊範圍內（對手看到「在 … 之中」的那幾個，或「一定不在 … 之中」以外的那幾個）。要顯示狀態資訊才有意義，不要加 x';
 const q35note='自己的得分由對手的題目決定：對手 Q35 → 對手選真實狀態時你 +1；Q36 → 對手選非真實狀態時 +1；Q37 → 對手選真實狀態時 −1；Q38 → 對手選非真實狀態時 −1';
 for(const n of [35,36,37,38])qnotes[n]=q35note;
 for(const n of [10,11,12,13,14,15,16,17,18,20,21,22,23,35,36,37,38,43,44,45,46])qnotes[n]=(qnotes[n]?qnotes[n]+'。':'')+'對手必須是 '+partners(n).map(y=>'Q'+y).join('、');
@@ -374,12 +376,15 @@ function render(){
  if(game.round===0){el('notice').textContent='尚未產生第一回合';el('qtitle').textContent='等待開始';el('qtitle').classList.remove('hide');el('rules').textContent='';}
  else{const qd=questions[game.question]||['',''];el('qtitle').textContent='你的題目';el('qtitle').dataset.q=game.question;
  el('timerule').textContent=`本回合有 ${game.seconds} 秒，每秒都計分。`;el('timecard').classList.remove('hide');
- el('rules').textContent=(game.mixed&&mixedRules[game.question])||qd[1];
+ // v38: decided per round. When I am told that the opponent's only possible question this round is mine, the original
+ // wording (which states both players' payoffs) is true even in a session where other rounds have different questions
+ const roundSame=!game.pool&&(game.opp_options||[]).length===1&&game.opp_options[0]===game.question;
+ el('rules').textContent=(game.mixed&&!roundSame&&mixedRules[game.question])||qd[1];
  // "對手本回合的題目" card: the opponent's candidate set (round design), the pool, or "same as yours"
  const pool=game.pool||[],opts=game.opp_options||(pool.length>1?pool:[]);
  // told, the opponent's only possible question is mine, and the shown rule already states both players' payoffs
  // (Q1–Q3 in their original wording, i.e. not a mixed session): just the rule, no title and no separate opponent card
- const sameQ=!game.pool&&opts.length===1&&opts[0]===game.question&&[1,2,3].includes(game.question)&&!game.mixed;el('qtitle').classList.toggle('hide',sameQ);
+ const sameQ=roundSame&&[1,2,3].includes(game.question);el('qtitle').classList.toggle('hide',sameQ);
  const showOpp=!sameQ&&(!!game.told_same||opts.length>0);
  el('poolinfo').classList.toggle('hide',!showOpp);
  el('poollead').textContent=game.told_same?'和你的題目相同。':(opts.length>1?'是下列其中之一：':'');el('poollead').classList.toggle('hide',!game.told_same&&opts.length<2);
